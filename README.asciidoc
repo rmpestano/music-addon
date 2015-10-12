@@ -1,0 +1,2 @@
+== Forge Music Addon
+Brings music to your IDE!
