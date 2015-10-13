@@ -161,7 +161,9 @@ public class PlaylistManagerImpl implements PlaylistManager {
         for (Resource<?> playList : playLists) {
             playList.delete();
         }
-        playlists.clear();
+        if(playlists != null){
+            playlists.clear();
+        }
     }
 
     public boolean hasDefaultPlaylist() {
