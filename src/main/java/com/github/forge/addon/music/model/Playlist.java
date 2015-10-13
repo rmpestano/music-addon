@@ -37,7 +37,15 @@ public class Playlist implements Serializable{
         if(!songs.contains(song)){
             songs.add(song);
         }
-        songs.add(song);
+    }
+
+    public void addSongs(List<Song> songs) {
+        if(this.songs == null || songs.isEmpty()){
+            return;
+        }
+        for (Song song : songs) {
+            addSong(song);
+        }
     }
 
     @Override
@@ -56,10 +64,5 @@ public class Playlist implements Serializable{
         return 32;
     }
 
-    public void addSongs(List<Song> songs) {
-        if(this.songs == null){
-            this.songs = new ArrayList<>();
-        }
-        this.songs.addAll(songs);
-    }
+
 }

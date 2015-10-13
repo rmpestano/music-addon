@@ -1,6 +1,6 @@
 package com.github.forge.addon.music.ui;
 
-import com.github.forge.addon.music.PlaylistManager;
+import com.github.forge.addon.music.playlist.PlaylistManagerImpl;
 import com.github.forge.addon.music.model.Song;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
@@ -47,7 +47,7 @@ public class NewPlaylistCommand extends AbstractUICommand {
 	private UIInputMany<FileResource<?>> songs;
 
 	@Inject
-	PlaylistManager manager;
+	PlaylistManagerImpl manager;
 
 	List<Song> playlist;
 

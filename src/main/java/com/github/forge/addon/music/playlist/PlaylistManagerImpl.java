@@ -1,19 +1,13 @@
-package com.github.forge.addon.music;
+package com.github.forge.addon.music.playlist;
 
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.playlist.PlaylistProvider;
 import com.github.forge.addon.music.util.Utils;
-import org.jboss.forge.addon.parser.json.resource.JsonResource;
 import org.jboss.forge.addon.resource.*;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import javax.json.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,11 +19,7 @@ import java.util.logging.Logger;
  * Created by pestano on 21/08/15.
  */
 @Singleton
-public class PlaylistManager implements PlaylistProvider {
-
-    public static final String DEFAULT_PLAYLIST = "default";
-
-    public String playListHome;
+public class PlaylistManagerImpl implements PlaylistManager {
 
     @Inject
     private Utils utils;
@@ -38,11 +28,10 @@ public class PlaylistManager implements PlaylistProvider {
     private ResourceFactory resourceFactory;
 
     private Map<String, Playlist> playlists;
-    private List<JsonObject> allPlaylists;
 
 
     public Map<String, Playlist> getPlaylists() {
-        if (playlists == null) {
+        if (playlists == null || playlists.isEmpty()) {
             playlists = initPlayLists();
         }
         return playlists;
@@ -62,8 +51,7 @@ public class PlaylistManager implements PlaylistProvider {
             List<Song> songs = new ArrayList<>();
             for (JsonValue jsonSong : jsonSongs) {
                 JsonObject songObject = (JsonObject) jsonSong;
-                Song song = new Song();
-                song.location(songObject.getString("location"));
+                Song song = new Song(songObject.getString("location"));
                 songs.add(song);
             }
             playlist.addSongs(songs);
@@ -85,25 +73,24 @@ public class PlaylistManager implements PlaylistProvider {
             JsonObject defaultPlaylistJson = Json.createObjectBuilder()
                                     .add("name", name)
                                     .add("songs", Json.createArrayBuilder().build()).build();
-            FileResource<?> defaultPlayListFile = playlistHomeDir.getChild(DEFAULT_PLAYLIST + ".json").reify(FileResource.class);
+            FileResource<?> defaultPlayListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
             defaultPlayListFile.createNewFile();
             defaultPlayListFile.setContents(defaultPlaylistJson.toString());
 
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist index.", e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
         }
     }
 
     @Override
-    public void savePlayList(String name) {
-        Playlist playlist = playlists.get(name);
+    public void savePlaylist(Playlist playlist) {
         FileResource<?> playListFile = getPlayListHomeDir().getChild(playlist.getName()+".json").reify(FileResource.class);
         if(!playListFile.exists()){
             playListFile.createNewFile();
         }
-        JsonArray songs = Json.createArrayBuilder().build();
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Song song : playlist.getSongs()) {
-            songs.add(Json.createObjectBuilder().
+            arrayBuilder.add(Json.createObjectBuilder().
                     add("title",song.getTitle()).
                     add("album",song.getAlbum()).
                     add("artist",song.getArtist()).
@@ -112,14 +99,15 @@ public class PlaylistManager implements PlaylistProvider {
                     add("year",song.getYear()).build()
             );
         }
-        playListFile.setContents(Json.createObjectBuilder().add("name",name).add("songs",songs).toString());
+        JsonArray songs = arrayBuilder.build();
+        playListFile.setContents(Json.createObjectBuilder().add("name",playlist.getName()).add("songs",songs).build().toString());
     }
 
     @Override
-    public JsonObject loadPlayList(String name) {
+    public JsonObject loadPlaylist(String name) {
         FileResource<?> playListFile = getPlayListHomeDir().getChild(name+".json").reify(FileResource.class);
         if(playListFile.exists()){
-            JsonObject jsonObject = playListFile.reify(JsonResource.class).getJsonObject();
+            JsonObject jsonObject = Json.createReader(playListFile.getResourceInputStream()).readObject();
             return jsonObject;
         }
         return null;
@@ -127,27 +115,24 @@ public class PlaylistManager implements PlaylistProvider {
     }
 
     @Override
-    public void addSong(String playlistName, Song song) {
+    public void addSong(Playlist playlist, Song song) {
+        playlist.addSong(song);
+        savePlaylist(playlist);
     }
 
     @Override
-    public void addSongs(String playlistName, List<Song> songs) {
+    public void addSongs(Playlist playlist, List<Song> songs) {
+        playlist.addSongs(songs);
+        savePlaylist(playlist);
     }
 
     @Override
-    public void removeSong(String playlistName, Song song) {
+    public void removeSong(Playlist playlist, Song song) {
+        playlist.getSongs().remove(song);
+        savePlaylist(playlist);
     }
 
 
-    /**
-     * if there is no playlist index, creates a playlists.json in FORGE_HOME with default playlist:
-     * [
-     * {
-     * "name" : "default",
-     * "songs": []
-     * }
-     * ]
-     */
     public void createDefaultPlaylist() {
         if (!hasDefaultPlaylist()) {
            createPlaylist(DEFAULT_PLAYLIST);
@@ -159,9 +144,28 @@ public class PlaylistManager implements PlaylistProvider {
         return utils.getForgeHome().getOrCreateChildDirectory("playlists");
     }
 
+    @Override
+    public boolean hasPlaylist(String name) {
+        FileResource<?> playlistFile = getPlayListHomeDir().getChild(name + ".json").reify(FileResource.class);
+        return playlistFile.exists();
+    }
+
+    @Override
+    public void removePlaylists() {
+        List<Resource<?>> playLists = getPlayListHomeDir().listResources(new ResourceFilter() {
+            @Override
+            public boolean accept(Resource<?> resource) {
+                return resource instanceof FileResource && resource.getName().endsWith(".json");
+            }
+        });
+        for (Resource<?> playList : playLists) {
+            playList.delete();
+        }
+        playlists.clear();
+    }
+
     public boolean hasDefaultPlaylist() {
-        FileResource<?> defaultPlaylist = getPlayListHomeDir().getChild(DEFAULT_PLAYLIST + ".json").reify(FileResource.class);
-        return defaultPlaylist.exists();
+        return hasPlaylist(DEFAULT_PLAYLIST);
     }
 
 
@@ -174,8 +178,7 @@ public class PlaylistManager implements PlaylistProvider {
             }
         });
         for (Resource<?> resource : playListsFound) {
-            JsonResource jsonResource = resource.reify(JsonResource.class);
-            JsonObject jsonObject = jsonResource.getJsonObject();
+            JsonObject jsonObject = Json.createReader(resource.getResourceInputStream()).readObject();
             playListsObject.add(jsonObject);
         }
         return playListsObject;

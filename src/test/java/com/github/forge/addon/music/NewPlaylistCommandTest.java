@@ -7,6 +7,7 @@
 
 package com.github.forge.addon.music;
 
+import com.github.forge.addon.music.playlist.PlaylistManagerImpl;
 import com.github.forge.addon.music.ui.NewPlaylistCommand;
 import org.hamcrest.core.Is;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -50,7 +51,7 @@ public class NewPlaylistCommandTest
    public static AddonArchive getDeployment()
    {
       return ShrinkWrap.create(AddonArchive.class).
-              addPackages(true, PlaylistManager.class.getPackage().getName()).addBeansXML();
+              addPackages(true, PlaylistManagerImpl.class.getPackage().getName()).addBeansXML();
    }
 
 

@@ -1,2 +1,7 @@
 == Forge Music Addon
 Brings music to your IDE!
+
+image:https://travis-ci.org/rmpestano/music-addon.svg[Build Status (Travis CI), link=https://travis-ci.org/rmpestano/music-addon]
+image:https://coveralls.io/repos/rmpestano/music-addon/badge.svg?branch=master&service=github[Coverage, link=https://coveralls.io/r/rmpestano/music-addon] 
+     
+

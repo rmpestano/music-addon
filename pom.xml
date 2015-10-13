@@ -40,21 +40,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.forge.addon</groupId>
-            <artifactId>parser-json</artifactId>
-            <classifier>forge-addon</classifier>
-            <scope>provided</scope>
+            <groupId>com.mpatric</groupId>
+            <artifactId>mp3agic</artifactId>
+            <version>0.8.3</version>
         </dependency>
+
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.mpatric</groupId>
-            <artifactId>mp3agic</artifactId>
-            <version>0.8.3</version>
         </dependency>
 
         <dependency>
@@ -128,6 +122,21 @@
             <id>release</id>
             <activation/>
             <build>
+                <resources>
+                    <resource>
+                        <filtering>true</filtering>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                </resources>
+                <testResources>
+                    <testResource>
+                        <filtering>true</filtering>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/java/</directory>
+                    </testResource>
+                </testResources>
                 <plugins>
                     <plugin>
                         <groupId>org.jboss.forge.furnace</groupId>
@@ -182,7 +191,7 @@
                         <artifactId>coveralls-maven-plugin</artifactId>
                         <version>3.1.0</version>
                         <configuration>
-                            <repoToken>eoIrtDYQcpLfbGHkOsmT0QenLfPKq0TTi</repoToken>
+                            <repoToken>1ac1Dki8DfXtELRaoQ0fnN1XM7yzUkpMw</repoToken>
                         </configuration>
                     </plugin>
                 </plugins>

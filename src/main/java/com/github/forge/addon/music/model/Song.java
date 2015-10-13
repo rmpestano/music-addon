@@ -2,6 +2,7 @@ package com.github.forge.addon.music.model;
 
 
 import com.mpatric.mp3agic.Mp3File;
+import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class Song {
     private String album;
     private String year;
     private String genre;
-    private List<Playlist> playlists;//a song can be in more then one playlist
+    public String duration;
 
     private transient Mp3File mp3File;
 
@@ -27,9 +28,8 @@ public class Song {
         return location;
     }
 
-    public Song location(String location) {
+    public Song(String location) {
         this.location = location;
-        return this;
     }
 
     public String getTitle() {
@@ -80,9 +80,24 @@ public class Song {
         return album;
     }
 
+    public String getDuration() {
+        if (duration == null) {
+            try {
+                duration = loadDuration();
+            } catch (Exception e) {
+                duration = "";
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song duration from file:" + location, e);
+            }
+        }
+        return duration;
+    }
+
 
     private String loadGenre() {
         Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getGenreDescription();
         } else {
@@ -92,6 +107,9 @@ public class Song {
 
     private String loadTitle() {
         Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getTitle();
         } else {
@@ -101,6 +119,9 @@ public class Song {
 
     private String loadYear() {
         Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getYear();
         } else {
@@ -121,6 +142,9 @@ public class Song {
 
     private String loadArtist() {
         Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getArtist();
         } else {
@@ -130,11 +154,22 @@ public class Song {
 
     private String loadAlbum() {
         Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getAlbum();
         } else {
             return mp3.getId3v2Tag().getAlbum();
         }
+    }
+
+    private String loadDuration() {
+        Mp3File mp3 = getMp3File();
+        if(mp3 == null){
+            return "Song not found at location "+location;
+        }
+        return DurationFormatUtils.formatDuration(mp3.getLengthInMilliseconds(),"m:ss");
     }
 
     public Mp3File getMp3File() {
@@ -150,24 +185,6 @@ public class Song {
     }
 
 
-    public List<Playlist> getPlaylists() {
-        return playlists;
-    }
-
-    public void addPlaylist(Playlist playlist) {
-        if (playlists == null) {
-            playlists = new ArrayList<>();
-        }
-        playlists.add(playlist);
-    }
-
-    public void removePlaylist(Playlist playlist) {
-        if (playlists == null) {
-            return;
-        }
-        playlists.remove(playlist);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -175,14 +192,12 @@ public class Song {
 
         Song song = (Song) o;
 
-        if (!title.equals(song.title)) return false;
-        return artist.equals(song.artist);
+        return location.equals(song.location);
 
     }
 
     @Override
     public int hashCode() {
-        int result = 17 + artist.hashCode();
-        return result;
+        return title != null ? title.hashCode():31;
     }
 }
