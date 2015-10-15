@@ -4,6 +4,8 @@ package com.github.forge.addon.music.model;
 import com.mpatric.mp3agic.Mp3File;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
+import javax.enterprise.inject.Vetoed;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -12,7 +14,8 @@ import java.util.logging.Logger;
 /**
  * Created by pestano on 21/08/15.
  */
-public class Song {
+@Vetoed
+public class Song implements Serializable{
 
     private String location;
     private String title;
@@ -21,6 +24,9 @@ public class Song {
     private String year;
     private String genre;
     public String duration;
+
+    public Song() {
+    }
 
     private transient Mp3File mp3File;
 

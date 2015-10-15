@@ -1,10 +1,14 @@
 package com.github.forge.addon.music.playlist;
 
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
+import com.github.forge.addon.music.model.Current;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.util.Utils;
 import org.jboss.forge.addon.resource.*;
 
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.json.*;
@@ -27,8 +31,12 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @Inject
     private ResourceFactory resourceFactory;
 
+    @Inject
+    private Event<ChangePlaylistEvent> changePlaylistEvent;
+
     private Map<String, Playlist> playlists;
 
+    private Playlist currentPlaylist;
 
     public Map<String, Playlist> getPlaylists() {
         if (playlists == null || playlists.isEmpty()) {
@@ -138,6 +146,19 @@ public class PlaylistManagerImpl implements PlaylistManager {
            createPlaylist(DEFAULT_PLAYLIST);
         }
 
+    }
+
+    @Override
+    @Produces
+    @Current
+    public Playlist getCurrentPlaylist() {
+        return currentPlaylist;
+    }
+
+    @Override
+    public void setCurrentPlaylist(Playlist currentPlaylist) {
+        this.currentPlaylist = currentPlaylist;
+        changePlaylistEvent.fire(new ChangePlaylistEvent(currentPlaylist));
     }
 
     private DirectoryResource getPlayListHomeDir() {

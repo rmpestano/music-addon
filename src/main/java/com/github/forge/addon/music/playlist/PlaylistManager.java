@@ -1,8 +1,11 @@
 package com.github.forge.addon.music.playlist;
 
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.List;
@@ -15,8 +18,9 @@ public interface PlaylistManager extends Serializable{
 
     String DEFAULT_PLAYLIST = "default";
 
-
     Map<String, Playlist> getPlaylists();
+
+    Playlist getCurrentPlaylist();
 
     /**
      * get playList object in memory
@@ -31,7 +35,6 @@ public interface PlaylistManager extends Serializable{
      * @return
      */
     void createPlaylist(String name);
-
 
     /**
      * save current state of playlist (which is memory) into FORGE_HOME/playlists/playlistName.json
@@ -69,7 +72,10 @@ public interface PlaylistManager extends Serializable{
      */
     void removeSong(Playlist playlist, Song song);
 
+    void setCurrentPlaylist(Playlist currentPlaylist);
+
     boolean hasPlaylist(String name);
 
     void removePlaylists();
+
 }

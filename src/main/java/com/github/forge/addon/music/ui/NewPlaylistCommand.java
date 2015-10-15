@@ -105,9 +105,6 @@ public class NewPlaylistCommand extends AbstractUICommand {
 		return Results.success("done!");
 	}
 
-	@Command(value = "test", categories = "music")
-	public String test() {
-		return "Command test executed";
-	}
+
 
 }
