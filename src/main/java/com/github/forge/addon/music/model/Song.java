@@ -190,6 +190,10 @@ public class Song implements Serializable{
         return mp3File;
     }
 
+    @Override
+    public String toString() {
+        return location;
+    }
 
     @Override
     public boolean equals(Object o) {

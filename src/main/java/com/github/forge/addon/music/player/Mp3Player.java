@@ -1,22 +1,36 @@
 package com.github.forge.addon.music.player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.google.common.util.concurrent.Monitor;
+import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.Equalizer;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.AudioDevice;
+import javazoom.jl.player.FactoryRegistry;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by pestano on 15/10/15.
  */
 @Singleton
-public class Mp3Player implements Player {
+public class Mp3Player implements Player  {
 
     @Inject
     private PlaylistManager playlistManager;
@@ -25,36 +39,125 @@ public class Mp3Player implements Player {
 
     private boolean repeat;
 
-    private List<Song> songQueue;
+    private List<Song> playQueue;
 
     private Song currentSong;
 
+    private javazoom.jl.player.Player jplayer;
+
+    private FileInputStream songStream;
+
+    private long songTotalLength;
+
+    private long pauseLocation;
+    private PausableExecutor executor;
+
     @Override
     public void play() {
-        if(currentSong == null){
-           next();
+        if (currentSong == null) {
+            next();
+            return;
         }
-        //play current song
 
+        String path = currentSong.getLocation();
+        try {
+            songStream = new FileInputStream(path);
+            songTotalLength = songStream.available();
+            createPlayerThread(songStream, EqualizerPresets.ROCK);
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, ex);
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    public void resume() {
+
+        String path = currentSong.getLocation();
+        try {
+            songStream = new FileInputStream(path);
+            songStream.skip(songTotalLength - pauseLocation);
+            executor.resume();
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, ex);
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    private void createPlayerThread(FileInputStream stream, EqualizerPresets preset) throws JavaLayerException {
+        Decoder decoder = new Decoder();
+        decoder.setEqualizer(new Equalizer(preset.getValue()));
+        AudioDevice device = FactoryRegistry.systemRegistry().createAudioDevice();
+        jplayer = new javazoom.jl.player.Player(stream,device);
+        if(executor == null || executor.isTerminated()){
+            executor = new PausableExecutor(1, Executors.privilegedThreadFactory());
+        }
+        executor.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    jplayer.play();
+                    System.out.println("play");
+                    if (jplayer.isComplete()) {
+                        System.out.println("complete");
+                        executor.shutdown();
+                        if (!repeat) {
+                            next();//get next song and play
+                        } else {
+                            play(); //play current song again
+                        }
+                    }
+                } catch (JavaLayerException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
     }
 
     @Override
     public void pause() {
-        //pause current song
+        if (jplayer != null) {
+            try {
+                pauseLocation = songStream.available();
+                jplayer.close();
+                executor.pause();
+            } catch (IOException e) {
+                //FIXME log ex
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void Stop() {
+        if (jplayer != null) {
+            jplayer.close();
+            pauseLocation = 0;
+            songTotalLength = 0;
+            try {
+                songStream.close();
+                executor.shutdown();
+            } catch (IOException e) {
+                //FIXME log ex
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void next() {
-        if(songQueue == null || songQueue.isEmpty()){
-            initQueue();
+        if (playQueue == null || playQueue.isEmpty()) {
+            initPlayQueue();
         }
-        if(!repeat){
-            if(shuffle){
-                shuffle();
-            }
-            currentSong = songQueue.get(0);
-            songQueue.remove(currentSong);
+        int index = 0;
+        if (shuffle) {
+            index = new Random(System.currentTimeMillis()).nextInt(playQueue.size());
         }
+        currentSong = playQueue.get(index);
+        playQueue.remove(index);
 
         play();
     }
@@ -62,19 +165,32 @@ public class Mp3Player implements Player {
 
     @Override
     public void shuffle() {
-        if(songQueue == null || songQueue.isEmpty()){
-            initQueue();
+        if (playQueue == null || playQueue.isEmpty()) {
+            initPlayQueue();
         }
-        Collections.shuffle(songQueue);
+        Collections.shuffle(playQueue);
     }
 
     @Override
-    public void initQueue() {
+    public void initPlayQueue() {
         if (playlistManager.getCurrentPlaylist() != null) {
-            songQueue = new LinkedList<>(playlistManager.getCurrentPlaylist().getSongs());
+            playQueue = new ArrayList<>(playlistManager.getCurrentPlaylist().getSongs());
         } else {
-            songQueue = new LinkedList<>(getAllSongs());
+            playQueue = new ArrayList<>(getAllSongs());
         }
+        if (playQueue.isEmpty()) {
+            throw new RuntimeException("No songs to play");
+        }
+    }
+
+    @Override
+    public List<Song> getPlayQueue() {
+        return playQueue;
+    }
+
+    @Override
+    public Song getCurrentSong() {
+        return currentSong;
     }
 
     @Override
@@ -96,4 +212,57 @@ public class Mp3Player implements Player {
     }
 
 
+
+
+    private class PausableExecutor extends ScheduledThreadPoolExecutor {
+
+        private boolean isPaused;
+
+        private final Monitor monitor = new Monitor();
+        private final Monitor.Guard paused = new Monitor.Guard(monitor) {
+            @Override
+            public boolean isSatisfied() {
+                return isPaused;
+            }
+        };
+
+        private final Monitor.Guard notPaused = new Monitor.Guard(monitor) {
+            @Override
+            public boolean isSatisfied() {
+                return !isPaused;
+            }
+        };
+
+        public PausableExecutor(int corePoolSize, ThreadFactory threadFactory) {
+            super(corePoolSize, threadFactory);
+        }
+
+        protected void beforeExecute(Thread t, Runnable r) {
+            super.beforeExecute(t, r);
+            monitor.enterWhenUninterruptibly(notPaused);
+            try {
+                monitor.waitForUninterruptibly(notPaused);
+            } finally {
+                monitor.leave();
+            }
+        }
+
+        public void pause() {
+            monitor.enterIf(notPaused);
+            try {
+                isPaused = true;
+            } finally {
+                monitor.leave();
+            }
+        }
+
+        public void resume() {
+            monitor.enterIf(paused);
+            try {
+                isPaused = false;
+            } finally {
+                monitor.leave();
+            }
+        }
+    }
 }

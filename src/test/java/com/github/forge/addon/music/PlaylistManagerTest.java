@@ -36,7 +36,7 @@ import static org.junit.Assert.assertThat;
 
 /**
  *
- * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
+ * @author <a href="rmpestano@gmail.com">Rafael Pestano</a>
  */
 @RunWith(Arquillian.class)
 public class PlaylistManagerTest {
@@ -99,12 +99,12 @@ public class PlaylistManagerTest {
         assertThat(playlist.getName(),is(equalTo("default")));
         Song sample = getSampleMp3();
         assertThat(sample.getMp3File(),is(notNullValue()));
-        assertThat(sample.getTitle(),is(equalTo("Hel As Himmel")));
-        assertThat(sample.getArtist(),is(equalTo("Baldrs Draumar")));
-        assertThat(sample.getAlbum(),is(equalTo("Aldgillissoan")));
+        assertThat(sample.getTitle(),is(equalTo("Axe Of Judgement")));
+        assertThat(sample.getArtist(),is(equalTo("Ensiferum")));
+        assertThat(sample.getAlbum(),is(equalTo("One Man Army")));
         assertThat(sample.getYear(),is(equalTo("2015")));
-        assertThat(sample.getGenre(),is(equalTo("Unknown")));
-        assertThat(sample.getDuration(),is(equalTo("0:27")));
+        assertThat(sample.getGenre(),is(equalTo("Metal")));
+        assertThat(sample.getDuration(),is(equalTo("0:14")));
     }
 
     @Test
@@ -135,7 +135,7 @@ public class PlaylistManagerTest {
 
     private Song getSampleMp3() {
         if(song == null){
-            song = new Song(Paths.get("target/test-classes").toAbsolutePath()+"/sample.mp3");
+            song = new Song(Paths.get("target/test-classes").toAbsolutePath()+ "/axe.mp3");
         }
         return song;
     }
