@@ -79,12 +79,17 @@ public class AudioControl {
     }
 
     public static Line getMasterOutputLine() {
+        Line backupLine = null;
         for (Mixer mixer : getMixers()) {
             for (Line line : getAvailableOutputLines(mixer)) {
-                if (line.getLineInfo().toString().contains("Master")) return line;
+                if (line.getLineInfo().toString().toLowerCase().contains("master")) {
+                    return line;
+                }else if(backupLine == null && getAvailableOutputLines(mixer) != null){
+                    backupLine = line;
+                }
             }
         }
-        return null;
+        return backupLine;
     }
 
     public static FloatControl getVolumeControl(Line line) {
