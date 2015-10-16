@@ -47,16 +47,20 @@ public class PlayerTest {
     @BeforeClass
     public static void setUp() {
         System.setProperty("forge.home", Paths.get("").toAbsolutePath().toString()+"/target");
-        masterVolume = AudioControl.getMasterOutputVolume();
-        masterMute = AudioControl.getMasterOutputMute();
-        AudioControl.setMasterOutputMute(false);
-        AudioControl.setMasterOutputVolume(0.2f);
+        if(AudioControl.isAudioEnabled()){
+            masterVolume = AudioControl.getMasterOutputVolume();
+            masterMute = AudioControl.getMasterOutputMute();
+            AudioControl.setMasterOutputMute(false);
+            AudioControl.setMasterOutputVolume(0.25f);
+        }
     }
 
     @AfterClass
     public static void after(){
-        AudioControl.setMasterOutputVolume(masterVolume);
-        AudioControl.setMasterOutputMute(masterMute);
+        if(AudioControl.isAudioEnabled()) {
+            AudioControl.setMasterOutputVolume(masterVolume);
+            AudioControl.setMasterOutputMute(masterMute);
+        }
     }
 
     @Before

@@ -2,10 +2,9 @@ package com.github.forge.addon.music.util;
 
 import javax.sound.sampled.*;
 import javax.sound.sampled.Control.Type;
-import javax.sound.sampled.Mixer.Info;
-import javax.sound.sampled.FloatControl;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by pestano on 16/10/15.
@@ -16,17 +15,25 @@ public class AudioControl {
             throw new IllegalArgumentException(
                     "Volume can only be set to a value from 0 to 1. Given value is illegal: " + value);
         Line line = getMasterOutputLine();
-        if (line == null) throw new RuntimeException("Master output port not found");
-        boolean opened = open(line);
-        try {
-            FloatControl control = getVolumeControl(line);
-            if (control == null)
-                throw new RuntimeException("Volume control not found in master port: " + toString(line));
-            control.setValue(value);
-        } finally {
-            if (opened) line.close();
+        if (isAudioEnabled()) {
+            boolean opened = open(line);
+            try {
+                FloatControl control = getVolumeControl(line);
+                if (control == null)
+                    throw new RuntimeException("Volume control not found in master port: " + toString(line));
+                control.setValue(value);
+            } finally {
+                if (opened) line.close();
+            }
+        } else {
+            Logger.getLogger(AudioControl.class.getName()).warning("Audio is not enabled in your devide");
         }
     }
+
+    public static boolean isAudioEnabled() {
+        return getMasterOutputLine() != null;
+    }
+
 
     public static Float getMasterOutputVolume() {
         Line line = getMasterOutputLine();
@@ -42,16 +49,19 @@ public class AudioControl {
     }
 
     public static void setMasterOutputMute(boolean value) {
-        Line line = getMasterOutputLine();
-        if (line == null) throw new RuntimeException("Master output port not found");
-        boolean opened = open(line);
-        try {
-            BooleanControl control = getMuteControl(line);
-            if (control == null)
-                throw new RuntimeException("Mute control not found in master port: " + toString(line));
-            control.setValue(value);
-        } finally {
-            if (opened) line.close();
+        if (isAudioEnabled()) {
+            Line line = getMasterOutputLine();
+            boolean opened = open(line);
+            try {
+                BooleanControl control = getMuteControl(line);
+                if (control == null)
+                    throw new RuntimeException("Mute control not found in master port: " + toString(line));
+                control.setValue(value);
+            } finally {
+                if (opened) line.close();
+            }
+        } else {
+            Logger.getLogger(AudioControl.class.getName()).warning("Audio is not enabled in your devide");
         }
     }
 
