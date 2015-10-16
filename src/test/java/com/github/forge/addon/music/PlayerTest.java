@@ -4,11 +4,13 @@ import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.player.Player;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.github.forge.addon.music.util.AudioControl;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +33,9 @@ public class PlayerTest {
 
     Song song;
 
+    private static float masterVolume;
+    private static boolean masterMute;
+
 
     @Deployment
     @AddonDependencies
@@ -42,6 +47,16 @@ public class PlayerTest {
     @BeforeClass
     public static void setUp() {
         System.setProperty("forge.home", Paths.get("").toAbsolutePath().toString()+"/target");
+        masterVolume = AudioControl.getMasterOutputVolume();
+        masterMute = AudioControl.getMasterOutputMute();
+        AudioControl.setMasterOutputMute(false);
+        AudioControl.setMasterOutputVolume(0.2f);
+    }
+
+    @AfterClass
+    public static void after(){
+        AudioControl.setMasterOutputVolume(masterVolume);
+        AudioControl.setMasterOutputMute(masterMute);
     }
 
     @Before
