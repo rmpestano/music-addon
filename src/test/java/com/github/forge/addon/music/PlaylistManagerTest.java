@@ -118,7 +118,7 @@ public class PlaylistManagerTest {
         JsonArray songsArray = defaultPlayList.getJsonArray("songs");
         assertThat(songsArray,is(notNullValue()));
         assertThat(songsArray.size(),is(equalTo(1)));
-        assertThat(((JsonObject)songsArray.get(0)).getString("title"),is(equalTo("Hel As Himmel")));
+        assertThat(((JsonObject)songsArray.get(0)).getString("title"),is(equalTo("Axe Of Judgement")));
     }
 
     @Test
