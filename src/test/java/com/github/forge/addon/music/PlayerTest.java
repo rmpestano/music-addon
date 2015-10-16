@@ -58,8 +58,8 @@ public class PlayerTest {
     @AfterClass
     public static void after(){
         if(AudioControl.isAudioEnabled()) {
-            AudioControl.setMasterOutputVolume(masterVolume);
-            AudioControl.setMasterOutputMute(masterMute);
+            //AudioControl.setMasterOutputVolume(masterVolume);
+            //AudioControl.setMasterOutputMute(masterMute);
         }
     }
 
