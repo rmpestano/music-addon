@@ -9,12 +9,10 @@ import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
-import javazoom.jl.player.advanced.AdvancedPlayer;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,38 +56,42 @@ public class Mp3Player implements Player  {
             next();
             return;
         }
+        try {
+            createAudioDevice();
+            runPlayerThread();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
 
+    }
+
+    private void createAudioDevice() {
         String path = currentSong.getLocation();
         try {
             songStream = new FileInputStream(path);
             songTotalLength = songStream.available();
-            createPlayerThread(songStream, EqualizerPresets.ROCK);
-        } catch (Exception ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, ex);
-            throw new RuntimeException(ex);
+            Decoder decoder = new Decoder();
+            decoder.setEqualizer(new Equalizer(EqualizerPresets.ROCK.getValue()));
+            AudioDevice device = FactoryRegistry.systemRegistry().createAudioDevice();
+            //device.open(decoder); //FIXME
+            jplayer = new javazoom.jl.player.Player(songStream, device);
+        }catch (Exception e){
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, e);
+            throw new RuntimeException("Could not play song " + path, e);
         }
-
     }
 
     public void resume() {
-
-        String path = currentSong.getLocation();
         try {
-            songStream = new FileInputStream(path);
-            songStream.skip(songTotalLength - pauseLocation);
+            createAudioDevice();
             executor.resume();
         } catch (Exception ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, ex);
             throw new RuntimeException(ex);
         }
 
     }
 
-    private void createPlayerThread(FileInputStream stream, EqualizerPresets preset) throws JavaLayerException {
-        Decoder decoder = new Decoder();
-        decoder.setEqualizer(new Equalizer(preset.getValue()));
-        AudioDevice device = FactoryRegistry.systemRegistry().createAudioDevice();
-        jplayer = new javazoom.jl.player.Player(stream,device);
+    private void runPlayerThread() throws JavaLayerException {
         if(executor == null || executor.isTerminated()){
             executor = new PausableExecutor(1, Executors.privilegedThreadFactory());
         }
