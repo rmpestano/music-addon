@@ -31,7 +31,7 @@ public class Utils {
     public DirectoryResource getForgeHome()
     {
         DirectoryResource forgeHome = resourceFactory.create(DirectoryResource.class,
-                OperatingSystemUtils.getForgeHomeDir());
+                OperatingSystemUtils.getUserForgeDir());
         return forgeHome;
     }
 

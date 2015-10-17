@@ -1,11 +1,8 @@
 package com.github.forge.addon.music.playlist;
 
-import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.List;
@@ -78,4 +75,5 @@ public interface PlaylistManager extends Serializable{
 
     void removePlaylists();
 
+    void removePlaylist(String name);
 }

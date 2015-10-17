@@ -6,8 +6,6 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 
 import javax.enterprise.inject.Vetoed;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

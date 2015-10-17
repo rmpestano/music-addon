@@ -1,10 +1,5 @@
 package com.github.forge.addon.music.player;
 
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-
-import javafx.scene.media.MediaPlayer;
-
 public enum  EqualizerPresets {
 	NORMAL(new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
 	CLASSICAL(new float[]{ -1.11022e-15f, -1.11022e-15f, -1.11022e-15f, -1.11022e-15f, -1.11022e-15f,

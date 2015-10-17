@@ -26,13 +26,10 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-
 import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  *

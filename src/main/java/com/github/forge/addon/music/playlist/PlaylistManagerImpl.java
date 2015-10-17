@@ -78,16 +78,17 @@ public class PlaylistManagerImpl implements PlaylistManager {
     public void createPlaylist(String name) {
         DirectoryResource playlistHomeDir = getPlayListHomeDir();
         try {
-            JsonObject defaultPlaylistJson = Json.createObjectBuilder()
+            JsonObject playlistJson = Json.createObjectBuilder()
                                     .add("name", name)
                                     .add("songs", Json.createArrayBuilder().build()).build();
-            FileResource<?> defaultPlayListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
-            defaultPlayListFile.createNewFile();
-            defaultPlayListFile.setContents(defaultPlaylistJson.toString());
+            FileResource<?> playListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
+            playListFile.createNewFile();
+            playListFile.setContents(playlistJson.toString());
 
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
         }
+        getPlaylists().putIfAbsent(name, new Playlist(name));
     }
 
     @Override
@@ -152,6 +153,9 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @Produces
     @Current
     public Playlist getCurrentPlaylist() {
+        if(currentPlaylist == null){
+            currentPlaylist = playlists.get(DEFAULT_PLAYLIST);
+        }
         return currentPlaylist;
     }
 
@@ -184,6 +188,17 @@ public class PlaylistManagerImpl implements PlaylistManager {
         }
         if(playlists != null){
             playlists.clear();
+        }
+    }
+
+    @Override
+    public void removePlaylist(String name) {
+        Resource<?> playList = getPlayListHomeDir().getChild(name+".json");
+        if(playList.exists()){
+            playList.delete();
+        }
+        if(playlists != null){
+            playlists.remove(name);
         }
     }
 

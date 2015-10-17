@@ -1,6 +1,5 @@
 package com.github.forge.addon.music.player;
 
-import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 
 import java.util.List;
