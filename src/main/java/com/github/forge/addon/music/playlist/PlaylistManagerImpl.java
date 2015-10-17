@@ -50,7 +50,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
      * where each json file is a playlist.
      */
     private Map<String, Playlist> initPlayLists() {
-        createDefaultPlaylist();
+        createPlaylist(DEFAULT_PLAYLIST);
         List<JsonObject> playListsJson = getAllPlaylists();
         playlists = new HashMap<>();
         for (JsonObject jsonObject : playListsJson) {
@@ -76,46 +76,48 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     @Override
     public void createPlaylist(String name) {
-        DirectoryResource playlistHomeDir = getPlayListHomeDir();
-        try {
-            JsonObject playlistJson = Json.createObjectBuilder()
-                                    .add("name", name)
-                                    .add("songs", Json.createArrayBuilder().build()).build();
-            FileResource<?> playListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
-            playListFile.createNewFile();
-            playListFile.setContents(playlistJson.toString());
+        if (!hasPlaylist(name)) {
+            DirectoryResource playlistHomeDir = getPlayListHomeDir();
+            try {
+                JsonObject playlistJson = Json.createObjectBuilder()
+                        .add("name", name)
+                        .add("songs", Json.createArrayBuilder().build()).build();
+                FileResource<?> playListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
+                playListFile.createNewFile();
+                playListFile.setContents(playlistJson.toString());
 
-        } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
+            } catch (Exception e) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
+            }
+            getPlaylists().putIfAbsent(name, new Playlist(name));
         }
-        getPlaylists().putIfAbsent(name, new Playlist(name));
     }
 
     @Override
     public void savePlaylist(Playlist playlist) {
-        FileResource<?> playListFile = getPlayListHomeDir().getChild(playlist.getName()+".json").reify(FileResource.class);
-        if(!playListFile.exists()){
+        FileResource<?> playListFile = getPlayListHomeDir().getChild(playlist.getName() + ".json").reify(FileResource.class);
+        if (!playListFile.exists()) {
             playListFile.createNewFile();
         }
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Song song : playlist.getSongs()) {
             arrayBuilder.add(Json.createObjectBuilder().
-                    add("title",song.getTitle()).
-                    add("album",song.getAlbum()).
-                    add("artist",song.getArtist()).
-                    add("genre",song.getGenre()).
-                    add("location",song.getLocation()).
-                    add("year",song.getYear()).build()
+                            add("title", song.getTitle()).
+                            add("album", song.getAlbum()).
+                            add("artist", song.getArtist()).
+                            add("genre", song.getGenre()).
+                            add("location", song.getLocation()).
+                            add("year", song.getYear()).build()
             );
         }
         JsonArray songs = arrayBuilder.build();
-        playListFile.setContents(Json.createObjectBuilder().add("name",playlist.getName()).add("songs",songs).build().toString());
+        playListFile.setContents(Json.createObjectBuilder().add("name", playlist.getName()).add("songs", songs).build().toString());
     }
 
     @Override
     public JsonObject loadPlaylist(String name) {
-        FileResource<?> playListFile = getPlayListHomeDir().getChild(name+".json").reify(FileResource.class);
-        if(playListFile.exists()){
+        FileResource<?> playListFile = getPlayListHomeDir().getChild(name + ".json").reify(FileResource.class);
+        if (playListFile.exists()) {
             JsonObject jsonObject = Json.createReader(playListFile.getResourceInputStream()).readObject();
             return jsonObject;
         }
@@ -142,18 +144,11 @@ public class PlaylistManagerImpl implements PlaylistManager {
     }
 
 
-    public void createDefaultPlaylist() {
-        if (!hasDefaultPlaylist()) {
-           createPlaylist(DEFAULT_PLAYLIST);
-        }
-
-    }
-
     @Override
     @Produces
     @Current
     public Playlist getCurrentPlaylist() {
-        if(currentPlaylist == null){
+        if (currentPlaylist == null) {
             currentPlaylist = playlists.get(DEFAULT_PLAYLIST);
         }
         return currentPlaylist;
@@ -186,24 +181,20 @@ public class PlaylistManagerImpl implements PlaylistManager {
         for (Resource<?> playList : playLists) {
             playList.delete();
         }
-        if(playlists != null){
+        if (playlists != null) {
             playlists.clear();
         }
     }
 
     @Override
     public void removePlaylist(String name) {
-        Resource<?> playList = getPlayListHomeDir().getChild(name+".json");
-        if(playList.exists()){
+        Resource<?> playList = getPlayListHomeDir().getChild(name + ".json");
+        if (playList.exists()) {
             playList.delete();
         }
-        if(playlists != null){
+        if (playlists != null) {
             playlists.remove(name);
         }
-    }
-
-    public boolean hasDefaultPlaylist() {
-        return hasPlaylist(DEFAULT_PLAYLIST);
     }
 
 

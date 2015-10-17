@@ -35,7 +35,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class AddMusicCommandTest {
+public class AddSongCommandTest {
 
     private static final String TEST_PLAY_LIST_NAME = "test-playlist";
 
@@ -63,7 +63,7 @@ public class AddMusicCommandTest {
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        Result result = shellTest.execute("add-songs --playlist " + TEST_PLAY_LIST_NAME +" --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
+        Result result = shellTest.execute("add-song --playlist " + TEST_PLAY_LIST_NAME +" --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
         Playlist playlist = playlistManager.getPlaylist(TEST_PLAY_LIST_NAME);
