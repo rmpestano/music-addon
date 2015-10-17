@@ -7,6 +7,8 @@
 
 package com.github.forge.addon.music;
 
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -22,25 +24,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
- *
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class NewPlaylistCommandTest {
+public class AddMusicCommandTest {
+
+    private static final String TEST_PLAY_LIST_NAME = "test-playlist";
+
 
     @Inject
     private UITestHarness uiTestHarness;
 
     @Inject
     private ShellTest shellTest;
-
-    private static final String TEST_PLAY_LIST_NAME = "test-playlist";
 
     @Inject
     PlaylistManager playlistManager;
@@ -54,14 +58,18 @@ public class NewPlaylistCommandTest {
 
     @Before
     public void before() {
-        playlistManager.removePlaylist(TEST_PLAY_LIST_NAME);
+        playlistManager.createPlaylist(TEST_PLAY_LIST_NAME);
     }
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
+        Result result = shellTest.execute("add-songs --playlist " + TEST_PLAY_LIST_NAME +" --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist("test"), is(true));
+        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
+        Playlist playlist = playlistManager.getPlaylist(TEST_PLAY_LIST_NAME);
+        assertNotNull(playlist);
+        Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() +"/axe.mp3");
+        assertThat(playlist.getSongs(),hasItem(song));
 
     }
 

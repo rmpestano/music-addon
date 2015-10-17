@@ -40,7 +40,7 @@ public class Playlist implements Serializable{
     }
 
     public void addSongs(List<Song> songs) {
-        if(this.songs == null || songs.isEmpty()){
+        if(songs == null ){
             return;
         }
         for (Song song : songs) {
