@@ -18,12 +18,11 @@ import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.nio.file.Paths;
@@ -49,7 +48,8 @@ public class PlaylistManagerTest {
 
     private Song song;
 
-    private Project project;
+    private String defaulUserHome;
+
 
     @Deployment
     @AddonDependencies
@@ -59,9 +59,15 @@ public class PlaylistManagerTest {
     }
 
 
-    @BeforeClass
-    public static void setUp() {
-        System.setProperty("forge.home", Paths.get("").toAbsolutePath().toString()+"/target");
+    @Before
+    public void setUp() {
+        defaulUserHome = System.getProperty("user.home");
+        System.setProperty("user.home", Paths.get("").toAbsolutePath().toString()+"/target");
+    }
+
+    @After
+    public void tearDown() {
+        System.setProperty("user.home", defaulUserHome);
     }
 
     @Before

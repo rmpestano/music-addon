@@ -10,13 +10,11 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
@@ -34,6 +32,8 @@ public class PlayerTest {
 
     Song song;
 
+    private String defaulUserHome;
+
     private static float masterVolume;
 
     private static boolean masterMute;
@@ -45,10 +45,11 @@ public class PlayerTest {
         return ShrinkWrap.create(AddonArchive.class).addBeansXML();
     }
 
-    @BeforeClass
-    public static void setUp() {
-        System.setProperty("forge.home", Paths.get("").toAbsolutePath().toString() + "/target");
+    @Before
+    public void setUp() {
         if (AudioControl.isAudioEnabled()) {
+            defaulUserHome = System.getProperty("user.home");
+            System.setProperty("user.home", Paths.get("").toAbsolutePath().toString()+"/target");
             masterVolume = AudioControl.getMasterOutputVolume();
             masterMute = AudioControl.getMasterOutputMute();
             AudioControl.setMasterOutputMute(false);
@@ -57,6 +58,15 @@ public class PlayerTest {
             Logger.getLogger(PlayerTest.class.getName()).warning("Audio device is no enabled, tests will be skipped");
         }
     }
+
+    @After
+    public void tearDown() {
+        if (AudioControl.isAudioEnabled()) {
+            System.setProperty("user.home", defaulUserHome);
+        }
+    }
+
+
 
     @AfterClass
     public static void after() {
