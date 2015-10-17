@@ -12,6 +12,7 @@ import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.shell.test.ShellTest;
 import org.jboss.forge.addon.ui.result.Failed;
 import org.jboss.forge.addon.ui.result.Result;
@@ -45,6 +46,7 @@ public class AddSongCommandTest extends BaseTest{
 
 
 
+
     @Deployment
     @AddonDependencies
     public static AddonArchive getDeployment() {
@@ -54,7 +56,7 @@ public class AddSongCommandTest extends BaseTest{
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        Result result = shellTest.execute("add-songs --playlist " + PlaylistManager.DEFAULT_PLAYLIST + " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-add-songs --playlist " + PlaylistManager.DEFAULT_PLAYLIST + " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(result.getMessage(),is(equalTo("1 song(s) added to playlist: " + PlaylistManager.DEFAULT_PLAYLIST)));
         assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));

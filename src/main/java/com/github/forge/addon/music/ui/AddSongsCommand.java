@@ -12,10 +12,8 @@ import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UIValidationContext;
 import org.jboss.forge.addon.ui.hints.InputType;
-import org.jboss.forge.addon.ui.input.UIInput;
-import org.jboss.forge.addon.ui.input.UIInputMany;
-import org.jboss.forge.addon.ui.input.UISelectMany;
-import org.jboss.forge.addon.ui.input.UISelectOne;
+import org.jboss.forge.addon.ui.input.*;
+import org.jboss.forge.addon.ui.input.events.ValueChangeEvent;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.Result;
@@ -24,19 +22,24 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+@Singleton
 public class AddSongsCommand extends AbstractUICommand {
 
 	@Inject
 	PlaylistManager playlistManager;
 
 
+	private DirectoryResource lastSelectedDir;
+
+
 	@Inject
-	@WithAttributes(label = "Target targetPlaylist", description = "Playlist which songs will be added", required = true, type = InputType.DROPDOWN)
+	@WithAttributes(label = "Target playlist", description = "Playlist which songs will be added", required = true, type = InputType.DROPDOWN)
 	private UISelectOne<String> targetPlaylist;
 
 	@Inject
@@ -51,7 +54,7 @@ public class AddSongsCommand extends AbstractUICommand {
 
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
-		return Metadata.forCommand(AddSongsCommand.class).name("add-songs")
+		return Metadata.forCommand(AddSongsCommand.class).name("Music: Add songs")
 				.description("Add songs into a playlist")
 				.category(Categories.create("music"));
 	}
@@ -62,7 +65,19 @@ public class AddSongsCommand extends AbstractUICommand {
 		Collections.sort(playlistNames);
 		targetPlaylist.setValueChoices(playlistNames);
 		targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+		if(lastSelectedDir != null){
+			dir.setDefaultValue(lastSelectedDir);
+		}
 		builder.add(targetPlaylist).add(dir).add(songs);
+
+		dir.addValueChangeListener(new ValueChangeListener() {
+			@Override
+			public void valueChanged(ValueChangeEvent valueChangeEvent) {
+				if(valueChangeEvent.getNewValue() != null){
+					lastSelectedDir = (DirectoryResource) valueChangeEvent.getNewValue();
+				}
+			}
+		});
 	}
 
 	@Override

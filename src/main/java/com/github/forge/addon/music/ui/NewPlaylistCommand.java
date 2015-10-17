@@ -32,7 +32,7 @@ public class NewPlaylistCommand extends AbstractUICommand {
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(NewPlaylistCommand.class)
-				.description("Creates a playlist").name("new playlist")
+				.description("Creates a playlist").name("Music: New playlist")
 				.category(Categories.create("Music"));
 	}
 

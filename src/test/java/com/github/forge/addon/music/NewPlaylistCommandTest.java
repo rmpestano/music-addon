@@ -49,7 +49,7 @@ public class NewPlaylistCommandTest extends BaseTest{
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
