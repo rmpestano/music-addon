@@ -59,7 +59,6 @@ public class NewPlaylistCommandTest {
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        System.out.println("wakeup travisci");
         Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist("test-playlist"), is(true));

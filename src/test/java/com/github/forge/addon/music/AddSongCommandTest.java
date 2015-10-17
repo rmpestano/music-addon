@@ -63,7 +63,6 @@ public class AddSongCommandTest {
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        System.out.println("wakeup travisci");
         Result result = shellTest.execute("add-song --playlist " + TEST_PLAY_LIST_NAME +" --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
