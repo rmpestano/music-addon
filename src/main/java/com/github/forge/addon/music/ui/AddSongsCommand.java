@@ -10,9 +10,11 @@ import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
+import org.jboss.forge.addon.ui.context.UIValidationContext;
 import org.jboss.forge.addon.ui.hints.InputType;
 import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UIInputMany;
+import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
@@ -34,21 +36,22 @@ public class AddSongsCommand extends AbstractUICommand {
 
 
 	@Inject
+	@WithAttributes(label = "Target targetPlaylist", description = "Playlist which songs will be added", required = true, type = InputType.DROPDOWN)
+	private UISelectOne<String> targetPlaylist;
+
+	@Inject
 	@WithAttributes(label = "Select dir", description = "Add songs by dir")
 	private UIInput<DirectoryResource> dir;
 
-	@Inject
-	@WithAttributes(label = "Songs", description = "Add songs from any dir")
-	private UIInputMany<FileResource<?>> songs;
 
 	@Inject
-	@WithAttributes(label = "Target playlist", description = "Playlist which songs will be added", required = true, type = InputType.DROPDOWN)
-	private UISelectOne<String> playlist
-			;
+	@WithAttributes(label = "Select songs", description = "Add songs from any dir")
+	private UIInputMany<FileResource<?>> songs;
+
 
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
-		return Metadata.forCommand(AddSongsCommand.class).name("add-song")
+		return Metadata.forCommand(AddSongsCommand.class).name("add-songs")
 				.description("Add songs into a playlist")
 				.category(Categories.create("music"));
 	}
@@ -57,10 +60,9 @@ public class AddSongsCommand extends AbstractUICommand {
 	public void initializeUI(UIBuilder builder) throws Exception {
 		List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
 		Collections.sort(playlistNames);
-		playlist.setValueChoices(playlistNames);
-		playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
-
-		builder.add(playlist).add(dir).add(songs);
+		targetPlaylist.setValueChoices(playlistNames);
+		targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+		builder.add(targetPlaylist).add(dir).add(songs);
 	}
 
 	@Override
@@ -69,10 +71,30 @@ public class AddSongsCommand extends AbstractUICommand {
 		if(dir.getValue() != null){
 			addSongsFromDir(dir.getValue(),songsToAdd);
 		}
-		Playlist plList = playlistManager.getPlaylist(playlist.getValue().toString());
+
+		if(songs.getValue() != null){
+			addSongFiles((List<FileResource<?>>) songs.getValue(),songsToAdd);
+		}
+
+		Playlist plList = playlistManager.getPlaylist(targetPlaylist.getValue().toString());
 		plList.addSongs(songsToAdd);
 		playlistManager.savePlaylist(plList);
-		return Results.success(songsToAdd.size()+" songs added to playlist "+playlist.getValue());
+		int numSongsAdded = songsToAdd.size();
+		songsToAdd.clear();
+		songs.setValue(null);
+		dir.setValue(null);
+			return Results.success(numSongsAdded + " song(s) added to playlist: " + plList.getName());
+	}
+
+	private void addSongFiles(List<FileResource<?>> songFiles, List<Song> songsToAdd) {
+		for (FileResource<?> songFile : songFiles) {
+			if(songFile.getName().toLowerCase().endsWith(".mp3") && songFile.exists()){
+				Song song = new Song(songFile.getFullyQualifiedName());
+				if(!songsToAdd.contains(song)){
+					songsToAdd.add(song);
+				}
+			}
+		}
 	}
 
 	private void addSongsFromDir(DirectoryResource root, List<Song> songsToAdd) {
@@ -86,5 +108,17 @@ public class AddSongsCommand extends AbstractUICommand {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void validate(UIValidationContext validator) {
+		super.validate(validator);
+		for (FileResource<?> fileResource : songs.getValue()) {
+			if(!fileResource.getName().toLowerCase().endsWith(".mp3")){
+				validator.addValidationError(songs,
+						"Songs must be in mp3 format");
+			}
+		}
+
 	}
 }

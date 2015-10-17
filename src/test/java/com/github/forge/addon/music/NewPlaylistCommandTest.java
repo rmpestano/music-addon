@@ -7,7 +7,6 @@
 
 package com.github.forge.addon.music;
 
-import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.shell.test.ShellTest;
@@ -17,7 +16,6 @@ import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,7 +30,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class NewPlaylistCommandTest {
+public class NewPlaylistCommandTest extends BaseTest{
 
     @Inject
     private UITestHarness uiTestHarness;
@@ -40,28 +38,19 @@ public class NewPlaylistCommandTest {
     @Inject
     private ShellTest shellTest;
 
-    private static final String TEST_PLAY_LIST_NAME = "test-playlist";
-
-    @Inject
-    PlaylistManager playlistManager;
 
     @Deployment
     @AddonDependencies
     public static AddonArchive getDeployment() {
-        return ShrinkWrap.create(AddonArchive.class).addBeansXML();
+        return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
-
-    @Before
-    public void before() {
-        playlistManager.removePlaylist(TEST_PLAY_LIST_NAME);
-    }
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
         Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist("test-playlist"), is(true));
+        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
 
     }
 

@@ -27,6 +27,9 @@ public class Playlist implements Serializable{
 
 
     public List<Song> getSongs() {
+        if(songs == null){
+            songs = new ArrayList<>();
+        }
         return songs;
     }
 

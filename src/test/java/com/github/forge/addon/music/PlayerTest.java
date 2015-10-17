@@ -10,11 +10,13 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
@@ -22,17 +24,13 @@ import java.util.logging.Logger;
  * Created by pestano on 15/10/15.
  */
 @RunWith(Arquillian.class)
-public class PlayerTest {
+public class PlayerTest extends BaseTest {
 
-    @Inject
-    PlaylistManager playlistManager;
 
     @Inject
     Player player;
 
     Song song;
-
-    private String defaulUserHome;
 
     private static float masterVolume;
 
@@ -42,55 +40,34 @@ public class PlayerTest {
     @AddonDependencies
     public static AddonArchive getDeployment() {
 
-        return ShrinkWrap.create(AddonArchive.class).addBeansXML();
+        return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         if (AudioControl.isAudioEnabled()) {
-            defaulUserHome = System.getProperty("user.home");
-            System.setProperty("user.home", Paths.get("").toAbsolutePath().toString()+"/target");
             masterVolume = AudioControl.getMasterOutputVolume();
             masterMute = AudioControl.getMasterOutputMute();
             AudioControl.setMasterOutputMute(false);
-            AudioControl.setMasterOutputVolume(0.25f);
+            AudioControl.setMasterOutputVolume(0.30f);
         } else {
             Logger.getLogger(PlayerTest.class.getName()).warning("Audio device is no enabled, tests will be skipped");
         }
     }
 
-    @After
-    public void tearDown() {
-        if (AudioControl.isAudioEnabled()) {
-            System.setProperty("user.home", defaulUserHome);
-        }
-    }
-
-
 
     @AfterClass
-    public static void after() {
+    public static void tearDown() {
         if (AudioControl.isAudioEnabled()) {
-            // AudioControl.setMasterOutputVolume(masterVolume);
+             //AudioControl.setMasterOutputVolume(masterVolume);
             // AudioControl.setMasterOutputMute(masterMute);
-        }
-    }
-
-    @Before
-    public void init() {
-        System.out.println("wakeup travisci");
-        if (AudioControl.isAudioEnabled()) {
-            playlistManager.removePlaylists();
-            Song song = getSampleMp3();
-            Playlist playlist = playlistManager.getPlaylist("default");
-            playlist.addSong(song);
-            playlistManager.savePlaylist(playlist);
         }
     }
 
     @Test
     public void shouldPlaySong() {
         if (AudioControl.isAudioEnabled()) {
+            saveSong();
             player.play();
         }
     }
@@ -98,10 +75,18 @@ public class PlayerTest {
     @Test
     public void shouldPlayAndResume() {
         if (AudioControl.isAudioEnabled()) {
+            saveSong();
             player.play();
             player.pause();
             player.resume();
         }
+    }
+
+    private void saveSong() {
+        Song song = getSampleMp3();
+        Playlist playlist = playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
+        playlist.addSong(song);
+        playlistManager.savePlaylist(playlist);
     }
 
     private Song getSampleMp3() {

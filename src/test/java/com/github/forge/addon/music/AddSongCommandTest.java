@@ -19,7 +19,6 @@ import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,9 +34,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class AddSongCommandTest {
-
-    private static final String TEST_PLAY_LIST_NAME = "test-playlist";
+public class AddSongCommandTest extends BaseTest{
 
 
     @Inject
@@ -46,30 +43,25 @@ public class AddSongCommandTest {
     @Inject
     private ShellTest shellTest;
 
-    @Inject
-    PlaylistManager playlistManager;
+
 
     @Deployment
     @AddonDependencies
     public static AddonArchive getDeployment() {
-        return ShrinkWrap.create(AddonArchive.class).addBeansXML();
+        return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
-
-    @Before
-    public void before() {
-        playlistManager.createPlaylist(TEST_PLAY_LIST_NAME);
-    }
 
     @Test
     public void shouldAddNewPlaylist() throws Exception {
-        Result result = shellTest.execute("add-song --playlist " + TEST_PLAY_LIST_NAME +" --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
+        Result result = shellTest.execute("add-songs --playlist " + PlaylistManager.DEFAULT_PLAYLIST + " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
-        Playlist playlist = playlistManager.getPlaylist(TEST_PLAY_LIST_NAME);
+        assertThat(result.getMessage(),is(equalTo("1 song(s) added to playlist: " + PlaylistManager.DEFAULT_PLAYLIST)));
+        assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));
+        Playlist playlist = playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
         assertNotNull(playlist);
-        Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() +"/axe.mp3");
-        assertThat(playlist.getSongs(),hasItem(song));
+        Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() + "/axe.mp3");
+        assertThat(playlist.getSongs(), hasItem(song));
 
     }
 

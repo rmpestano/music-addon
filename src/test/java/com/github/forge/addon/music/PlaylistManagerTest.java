@@ -10,19 +10,14 @@ package com.github.forge.addon.music;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
-import com.github.forge.addon.music.util.Utils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.nio.file.Paths;
@@ -31,48 +26,20 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author <a href="rmpestano@gmail.com">Rafael Pestano</a>
  */
 @RunWith(Arquillian.class)
-public class PlaylistManagerTest {
+public class PlaylistManagerTest extends BaseTest {
 
-    @Inject
-    private PlaylistManager playlistManager;
-
-    @Inject
-    private ProjectFactory projectFactory;
-
-    @Inject
-    Utils utils;
 
     private Song song;
-
-    private String defaulUserHome;
 
 
     @Deployment
     @AddonDependencies
     public static AddonArchive getDeployment() {
 
-        return ShrinkWrap.create(AddonArchive.class).addBeansXML();
-    }
-
-
-    @Before
-    public void setUp() {
-        defaulUserHome = System.getProperty("user.home");
-        System.setProperty("user.home", Paths.get("").toAbsolutePath().toString()+"/target");
-    }
-
-    @After
-    public void tearDown() {
-        System.setProperty("user.home", defaulUserHome);
-    }
-
-    @Before
-    public void init(){
-        playlistManager.removePlaylists();
+        return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
 
@@ -97,48 +64,48 @@ public class PlaylistManagerTest {
     }
 
     @Test
-    public void shouldLoadSongProperties(){
+    public void shouldLoadSongProperties() {
         Playlist playlist = playlistManager.getPlaylist("default");
-        assertThat(playlist.getName(),is(equalTo("default")));
+        assertThat(playlist.getName(), is(equalTo("default")));
         Song sample = getSampleMp3();
-        assertThat(sample.getMp3File(),is(notNullValue()));
-        assertThat(sample.getTitle(),is(equalTo("Axe Of Judgement")));
-        assertThat(sample.getArtist(),is(equalTo("Ensiferum")));
-        assertThat(sample.getAlbum(),is(equalTo("One Man Army")));
-        assertThat(sample.getYear(),is(equalTo("2015")));
-        assertThat(sample.getGenre(),is(equalTo("Metal")));
-        assertThat(sample.getDuration(),is(equalTo("0:14")));
+        assertThat(sample.getMp3File(), is(notNullValue()));
+        assertThat(sample.getTitle(), is(equalTo("Axe Of Judgement")));
+        assertThat(sample.getArtist(), is(equalTo("Ensiferum")));
+        assertThat(sample.getAlbum(), is(equalTo("One Man Army")));
+        assertThat(sample.getYear(), is(equalTo("2015")));
+        assertThat(sample.getGenre(), is(equalTo("Metal")));
+        assertThat(sample.getDuration(), is(equalTo("0:14")));
     }
 
     @Test
-    public void shouldSaveSong(){
+    public void shouldSaveSong() {
         Song song = getSampleMp3();
         Playlist playlist = playlistManager.getPlaylist("default");
         playlist.addSong(song);
         playlistManager.savePlaylist(playlist);
         JsonObject defaultPlayList = playlistManager.loadPlaylist("default");
-        assertThat(defaultPlayList.getString("name"),is(equalTo("default")));
+        assertThat(defaultPlayList.getString("name"), is(equalTo("default")));
         JsonArray songsArray = defaultPlayList.getJsonArray("songs");
-        assertThat(songsArray,is(notNullValue()));
-        assertThat(songsArray.size(),is(equalTo(1)));
-        assertThat(((JsonObject)songsArray.get(0)).getString("title"),is(equalTo("Axe Of Judgement")));
+        assertThat(songsArray, is(notNullValue()));
+        assertThat(songsArray.size(), is(equalTo(1)));
+        assertThat(((JsonObject) songsArray.get(0)).getString("title"), is(equalTo("Axe Of Judgement")));
     }
 
     @Test
-    public void shouldRemoveSong(){
+    public void shouldRemoveSong() {
         shouldSaveSong();
         Playlist playlist = playlistManager.getPlaylist("default");
-        playlistManager.removeSong(playlist,getSampleMp3());
+        playlistManager.removeSong(playlist, getSampleMp3());
         JsonObject defaultPlayList = playlistManager.loadPlaylist("default");
-        assertThat(defaultPlayList.getString("name"),is(equalTo("default")));
+        assertThat(defaultPlayList.getString("name"), is(equalTo("default")));
         JsonArray songsArray = defaultPlayList.getJsonArray("songs");
-        assertThat(songsArray,is(notNullValue()));
-        assertThat(songsArray.size(),is(equalTo(0)));
+        assertThat(songsArray, is(notNullValue()));
+        assertThat(songsArray.size(), is(equalTo(0)));
     }
 
     private Song getSampleMp3() {
-        if(song == null){
-            song = new Song(Paths.get("target/test-classes").toAbsolutePath()+ "/axe.mp3");
+        if (song == null) {
+            song = new Song(Paths.get("target/test-classes").toAbsolutePath() + "/axe.mp3");
         }
         return song;
     }
