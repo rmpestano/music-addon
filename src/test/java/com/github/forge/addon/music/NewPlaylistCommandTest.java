@@ -61,7 +61,7 @@ public class NewPlaylistCommandTest {
     public void shouldAddNewPlaylist() throws Exception {
         Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist("test"), is(true));
+        assertThat(playlistManager.hasPlaylist("test-playlist"), is(true));
 
     }
 
