@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -49,6 +50,10 @@ public class NewPlaylistCommandTest extends BaseTest{
     @Test
     public void shouldAddNewPlaylist() throws Exception {
         Result result = shellTest.execute("new-playlist --name " + TEST_PLAY_LIST_NAME, 25, TimeUnit.SECONDS);
+        if(result instanceof Failed){
+            Logger.getLogger(getClass().getName()).severe(result.getMessage());
+        }
+
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
 
