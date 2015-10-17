@@ -66,6 +66,7 @@ public class PlaylistManagerTest {
 
     @Before
     public void init(){
+        System.out.println("wakeup travisci");
         playlistManager.removePlaylists();
     }
 

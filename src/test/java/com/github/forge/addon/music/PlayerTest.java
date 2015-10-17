@@ -68,6 +68,7 @@ public class PlayerTest {
 
     @Before
     public void init() {
+        System.out.println("wakeup travisci");
         if (AudioControl.isAudioEnabled()) {
             playlistManager.removePlaylists();
             Song song = getSampleMp3();
