@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -110,7 +111,7 @@ public class Mp3Player implements Player {
 
 
     private void runPlayerThread() throws JavaLayerException {
-        if (executor == null || executor.isTerminated()) {
+        if (executor == null || executor.isTerminated() || executor.isShutdown()) {
             executor = Executors.newSingleThreadExecutor(Executors.privilegedThreadFactory());
         } else {
             cancelPlayingSong();
@@ -123,6 +124,7 @@ public class Mp3Player implements Player {
         }
 
         playingSong = executor.submit(playerThread);
+
     }
 
     private Thread createPlayerThread() {
@@ -132,7 +134,7 @@ public class Mp3Player implements Player {
             public void run() {
                 try {
                     jplayer.play();
-                } catch (JavaLayerException ex) {
+                } catch (Exception ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
                     throw new RuntimeException(ex);
                 }
@@ -201,6 +203,7 @@ public class Mp3Player implements Player {
         }
         if(isPlaying()){
             try {
+                pauseLocation = 0;
                 songStream.close();
                 jplayer.close();
                 executor.shutdownNow();
