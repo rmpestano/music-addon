@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -118,30 +117,29 @@ public class Mp3Player implements Player {
             executor.shutdownNow();
         }
 
-
-        if (playerThread == null) {
-            playerThread = createPlayerThread();
-        }
-
-        playingSong = executor.submit(playerThread);
+        playingSong = executor.submit(getPlayerThread());
 
     }
 
-    private Thread createPlayerThread() {
-        playerThread = new Thread(new Runnable() {
+    private Thread getPlayerThread() {
+        if (playerThread == null) {
+            playerThread = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    jplayer.play();
-                } catch (Exception ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
-                    throw new RuntimeException(ex);
+                @Override
+                public void run() {
+                    try {
+                        jplayer.play();
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
+                        throw new RuntimeException(ex);
+                    }
                 }
-            }
 
-        });
-        playerThread.setDaemon(true);
+            });
+            playerThread.setDaemon(true);
+        }
+
+
         return playerThread;
     }
 
@@ -198,16 +196,16 @@ public class Mp3Player implements Player {
             index = new Random(System.currentTimeMillis()).nextInt(playQueue.size());
         }
         currentSong = playQueue.get(index);
-        if(!isRepeat()){
+        if (!isRepeat()) {
             playQueue.remove(index);
         }
-        if(isPlaying()){
+        if (isPlaying()) {
             try {
                 pauseLocation = 0;
                 songStream.close();
                 jplayer.close();
                 executor.shutdownNow();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 //FIXME log ex e show msg
             }
@@ -281,7 +279,7 @@ public class Mp3Player implements Player {
     }
 
 
-    public void onPlaylistChanged(@Observes ChangePlaylistEvent playlistEvent){
+    public void onPlaylistChanged(@Observes ChangePlaylistEvent playlistEvent) {
         playQueue = null;
         next();
     }
