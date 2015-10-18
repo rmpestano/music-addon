@@ -41,7 +41,7 @@ public class NextCommand extends AbstractUICommand {
 
 		player.next();
 		Song song = player.getCurrentSong();
-		return Results.success("Now playing: "+song.getArtist() +" - " + song.getTitle() +" - Album "+song.getAlbum());
+		return Results.success("Now playing: "+song.info());
 	}
 
 
