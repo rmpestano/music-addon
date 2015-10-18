@@ -3,12 +3,14 @@ package com.github.forge.addon.music.player;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
-import com.google.common.util.concurrent.Monitor;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,12 +30,12 @@ import java.util.logging.Logger;
  * Created by pestano on 15/10/15.
  */
 @Singleton
-public class Mp3Player implements Player  {
+public class Mp3Player implements Player {
 
     @Inject
     private PlaylistManager playlistManager;
 
-    private boolean shuffle;
+    private boolean shuffle = true;
 
     private boolean repeat;
 
@@ -41,26 +43,36 @@ public class Mp3Player implements Player  {
 
     private Song currentSong;
 
-    private javazoom.jl.player.Player jplayer;
+    private AdvancedPlayer jplayer;
 
     private FileInputStream songStream;
 
     private long songTotalLength;
 
     private long pauseLocation;
-    private PausableExecutor executor;
+
+    private ExecutorService executor;
+
+    private Future<?> playingSong;
+
+    private AudioDevice device;
+
+    private Thread playerThread;
+
 
     @Override
     public void play() {
-        if (currentSong == null) {
-            next();
-            return;
-        }
-        try {
-            createAudioDevice();
-            runPlayerThread();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        if (!isPlaying()) {
+            if (currentSong == null) {
+                next();
+                return;
+            }
+            try {
+                createAudioDevice();
+                runPlayerThread();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
     }
@@ -70,53 +82,80 @@ public class Mp3Player implements Player  {
         try {
             songStream = new FileInputStream(path);
             songTotalLength = songStream.available();
+
+            if (pauseLocation > 0) {
+                songStream.skip(songTotalLength - pauseLocation);
+            }
             Decoder decoder = new Decoder();
             decoder.setEqualizer(new Equalizer(EqualizerPresets.ROCK.getValue()));
-            AudioDevice device = FactoryRegistry.systemRegistry().createAudioDevice();
+            device = FactoryRegistry.systemRegistry().createAudioDevice();
             //device.open(decoder); //FIXME
-            jplayer = new javazoom.jl.player.Player(songStream, device);
-        }catch (Exception e){
+            jplayer = new AdvancedPlayer(songStream, device);
+            jplayer.setPlayBackListener(new PlaybackListener() {
+                @Override
+                public void playbackFinished(PlaybackEvent evt) {
+                    if (!repeat) {
+                        next();//get next song and play
+                    } else {
+                        play(); //play current song again
+                    }
+                }
+            });
+        } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, e);
-            throw new RuntimeException("Could not play song " + path, e);
+            throw new RuntimeException("Could not play song " + path + " " + e.getMessage(), e);
         }
     }
 
     public void resume() {
         try {
             createAudioDevice();
-            executor.resume();
+            runPlayerThread();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
 
     }
 
+
     private void runPlayerThread() throws JavaLayerException {
-        if(executor == null || executor.isTerminated()){
-            executor = new PausableExecutor(1, Executors.privilegedThreadFactory());
+        if (executor == null || executor.isTerminated()) {
+            executor = Executors.newSingleThreadExecutor(Executors.privilegedThreadFactory());
+        } else {
+            cancelPlayingSong();
+            executor.shutdownNow();
         }
-        executor.execute(new Runnable() {
+
+
+        if (playerThread == null) {
+            playerThread = createPlayerThread();
+        }
+
+        playingSong = executor.submit(playerThread);
+    }
+
+    private Thread createPlayerThread() {
+        playerThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
                     jplayer.play();
-                    System.out.println("play");
-                    if (jplayer.isComplete()) {
-                        System.out.println("complete");
-                        executor.shutdown();
-                        if (!repeat) {
-                            next();//get next song and play
-                        } else {
-                            play(); //play current song again
-                        }
-                    }
                 } catch (JavaLayerException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
                     throw new RuntimeException(ex);
                 }
             }
+
         });
+        playerThread.setDaemon(true);
+        return playerThread;
+    }
+
+    private void cancelPlayingSong() {
+        if (playingSong != null && !playingSong.isDone()) {
+            playingSong.cancel(true);
+        }
     }
 
     @Override
@@ -125,7 +164,7 @@ public class Mp3Player implements Player  {
             try {
                 pauseLocation = songStream.available();
                 jplayer.close();
-                executor.pause();
+                executor.shutdownNow();
             } catch (IOException e) {
                 //FIXME log ex
                 e.printStackTrace();
@@ -134,14 +173,19 @@ public class Mp3Player implements Player  {
     }
 
     @Override
-    public void Stop() {
+    public void stop() {
+        cancelPlayingSong();
         if (jplayer != null) {
             jplayer.close();
+            if (device != null) {
+                device.close();
+                device = null;
+            }
             pauseLocation = 0;
             songTotalLength = 0;
             try {
                 songStream.close();
-                executor.shutdown();
+                executor.shutdownNow();
             } catch (IOException e) {
                 //FIXME log ex
                 e.printStackTrace();
@@ -214,57 +258,17 @@ public class Mp3Player implements Player  {
     }
 
 
+    @Override
+    public boolean isPlaying() {
+        return (executor != null && (!executor.isTerminated() && !executor.isShutdown()));
+    }
 
-
-    private class PausableExecutor extends ScheduledThreadPoolExecutor {
-
-        private boolean isPaused;
-
-        private final Monitor monitor = new Monitor();
-        private final Monitor.Guard paused = new Monitor.Guard(monitor) {
-            @Override
-            public boolean isSatisfied() {
-                return isPaused;
-            }
-        };
-
-        private final Monitor.Guard notPaused = new Monitor.Guard(monitor) {
-            @Override
-            public boolean isSatisfied() {
-                return !isPaused;
-            }
-        };
-
-        public PausableExecutor(int corePoolSize, ThreadFactory threadFactory) {
-            super(corePoolSize, threadFactory);
+    @Override
+    public String getCurrentSongTime() {
+        if (currentSong == null) {
+            return "";
         }
-
-        protected void beforeExecute(Thread t, Runnable r) {
-            super.beforeExecute(t, r);
-            monitor.enterWhenUninterruptibly(notPaused);
-            try {
-                monitor.waitForUninterruptibly(notPaused);
-            } finally {
-                monitor.leave();
-            }
-        }
-
-        public void pause() {
-            monitor.enterIf(notPaused);
-            try {
-                isPaused = true;
-            } finally {
-                monitor.leave();
-            }
-        }
-
-        public void resume() {
-            monitor.enterIf(paused);
-            try {
-                isPaused = false;
-            } finally {
-                monitor.leave();
-            }
-        }
+        //DurationFormatUtils.formatDuration(mp3.getLengthInMilliseconds(), "m:ss");
+        return "" + device.getPosition();
     }
 }

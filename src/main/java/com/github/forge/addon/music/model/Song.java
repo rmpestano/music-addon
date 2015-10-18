@@ -21,7 +21,7 @@ public class Song implements Serializable{
     private String album;
     private String year;
     private String genre;
-    public String duration;
+    private String duration;
 
     public Song() {
     }
@@ -207,5 +207,9 @@ public class Song implements Serializable{
     @Override
     public int hashCode() {
         return title != null ? title.hashCode():31;
+    }
+
+    public String info() {
+        return getArtist() +" - " + getTitle() +" ("+getDuration()+"). Album "+getAlbum();
     }
 }

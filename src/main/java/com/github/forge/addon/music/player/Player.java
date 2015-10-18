@@ -24,7 +24,7 @@ public interface Player {
      */
     void pause();
 
-    void Stop();
+    void stop();
 
     /**
      * get next song and play it
@@ -64,4 +64,8 @@ public interface Player {
      * @param repeat
      */
     void setRepeat(boolean repeat);
+
+    boolean isPlaying();
+
+    String getCurrentSongTime();
 }

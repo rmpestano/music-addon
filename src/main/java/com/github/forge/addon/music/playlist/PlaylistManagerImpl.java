@@ -149,7 +149,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @Current
     public Playlist getCurrentPlaylist() {
         if (currentPlaylist == null) {
-            currentPlaylist = playlists.get(DEFAULT_PLAYLIST);
+            currentPlaylist = getPlaylists().get(DEFAULT_PLAYLIST);
         }
         return currentPlaylist;
     }
