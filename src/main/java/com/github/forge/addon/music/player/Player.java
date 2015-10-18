@@ -10,14 +10,11 @@ import java.util.List;
 public interface Player {
 
     /**
-     * plays current song
+     * plays or resumes current song
      */
     void play();
 
-    /**
-     * resumes current song
-     */
-    void resume();
+
 
     /**
      * pauses current song
@@ -67,5 +64,4 @@ public interface Player {
 
     boolean isPlaying();
 
-    String getCurrentSongTime();
 }

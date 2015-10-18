@@ -78,7 +78,7 @@ public class PlayerTest extends BaseTest {
             saveSong();
             player.play();
             player.pause();
-            player.resume();
+            player.play();
         }
     }
 

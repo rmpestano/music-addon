@@ -14,6 +14,7 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
 import javax.inject.Inject;
+import java.util.List;
 
 /**
  * Created by pestano on 16/08/15.
@@ -50,12 +51,21 @@ public class StatusCommand extends AbstractUICommand {
 			return Results.success("player is stopped");
 		} else{
 			Song song = player.getCurrentSong();
-
-			return Results.success(song.info());
+			return Results.success(song.info() + " from playlist: "+playlistManager.getCurrentPlaylist().getName() + getNextSongInfo());
 		}
 
 	}
 
+	private String getNextSongInfo() {
+		List<Song> playQueue = player.getPlayQueue();
+		if(playQueue != null && !playQueue.isEmpty()){
+			Song nextSong = player.getPlayQueue().get(0);
+			return (", next song in play queue - "+ nextSong.getTitle() + " ("+nextSong.getDuration()+")");
+		}
+
+		return "";
+
+	}
 
 
 }

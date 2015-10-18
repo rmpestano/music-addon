@@ -35,7 +35,7 @@ public class Mp3Player implements Player {
     @Inject
     private PlaylistManager playlistManager;
 
-    private boolean shuffle = true;
+    private boolean shuffle;
 
     private boolean repeat;
 
@@ -90,31 +90,20 @@ public class Mp3Player implements Player {
             decoder.setEqualizer(new Equalizer(EqualizerPresets.ROCK.getValue()));
             device = FactoryRegistry.systemRegistry().createAudioDevice();
             //device.open(decoder); //FIXME
+            if (jplayer != null) {
+                jplayer.close();
+            }
             jplayer = new AdvancedPlayer(songStream, device);
             jplayer.setPlayBackListener(new PlaybackListener() {
                 @Override
                 public void playbackFinished(PlaybackEvent evt) {
-                    if (!repeat) {
-                        next();//get next song and play
-                    } else {
-                        play(); //play current song again
-                    }
+                    next();
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not play song " + path, e);
             throw new RuntimeException("Could not play song " + path + " " + e.getMessage(), e);
         }
-    }
-
-    public void resume() {
-        try {
-            createAudioDevice();
-            runPlayerThread();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-
     }
 
 
@@ -156,6 +145,7 @@ public class Mp3Player implements Player {
         if (playingSong != null && !playingSong.isDone()) {
             playingSong.cancel(true);
         }
+
     }
 
     @Override
@@ -164,8 +154,9 @@ public class Mp3Player implements Player {
             try {
                 pauseLocation = songStream.available();
                 jplayer.close();
+                songStream.close();
                 executor.shutdownNow();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 //FIXME log ex
                 e.printStackTrace();
             }
@@ -203,8 +194,19 @@ public class Mp3Player implements Player {
             index = new Random(System.currentTimeMillis()).nextInt(playQueue.size());
         }
         currentSong = playQueue.get(index);
-        playQueue.remove(index);
-
+        if(!repeat){
+            playQueue.remove(index);
+        }
+        if(isPlaying()){
+            try {
+                songStream.close();
+                jplayer.close();
+                executor.shutdownNow();
+            }catch (Exception e){
+                e.printStackTrace();
+                //FIXME log ex e show msg
+            }
+        }
         play();
     }
 
@@ -263,12 +265,4 @@ public class Mp3Player implements Player {
         return (executor != null && (!executor.isTerminated() && !executor.isShutdown()));
     }
 
-    @Override
-    public String getCurrentSongTime() {
-        if (currentSong == null) {
-            return "";
-        }
-        //DurationFormatUtils.formatDuration(mp3.getLengthInMilliseconds(), "m:ss");
-        return "" + device.getPosition();
-    }
 }
