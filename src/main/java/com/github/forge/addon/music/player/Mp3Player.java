@@ -1,5 +1,6 @@
 package com.github.forge.addon.music.player;
 
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
@@ -12,6 +13,7 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
@@ -190,11 +192,11 @@ public class Mp3Player implements Player {
             initPlayQueue();
         }
         int index = 0;
-        if (shuffle) {
+        if (isShuffle()) {
             index = new Random(System.currentTimeMillis()).nextInt(playQueue.size());
         }
         currentSong = playQueue.get(index);
-        if(!repeat){
+        if(!isRepeat()){
             playQueue.remove(index);
         }
         if(isPlaying()){
@@ -208,6 +210,16 @@ public class Mp3Player implements Player {
             }
         }
         play();
+    }
+
+    @Override
+    public boolean isRepeat() {
+        return repeat;
+    }
+
+    @Override
+    public boolean isShuffle() {
+        return shuffle;
     }
 
 
@@ -262,7 +274,13 @@ public class Mp3Player implements Player {
 
     @Override
     public boolean isPlaying() {
-        return (executor != null && (!executor.isTerminated() && !executor.isShutdown()));
+        return (currentSong != null && executor != null && (!executor.isTerminated() && !executor.isShutdown()));
+    }
+
+
+    public void onPlaylistChanged(@Observes ChangePlaylistEvent playlistEvent){
+        playQueue = null;
+        next();
     }
 
 }

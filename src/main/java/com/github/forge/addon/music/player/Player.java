@@ -28,6 +28,10 @@ public interface Player {
      */
     void next();
 
+    boolean isRepeat();
+
+    boolean isShuffle();
+
     /**
      * shuffles queued songs
      */

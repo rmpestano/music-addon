@@ -82,13 +82,7 @@ public class AddSongsCommand extends AbstractUICommand {
             }
         });
 
-        targetPlaylist.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                String selectedPlaylist = valueChangeEvent.getNewValue().toString();
-                playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(selectedPlaylist));
-            }
-        });
+
     }
 
     @Override
