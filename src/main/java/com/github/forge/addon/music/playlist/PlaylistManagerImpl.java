@@ -71,7 +71,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     @Override
     public void createPlaylist(String name) {
-        if (!hasPlaylist(name)) {
+        if (!hasPlaylist(name) && !getPlaylists().containsKey(name)) {
             DirectoryResource playlistHomeDir = getPlayListHomeDir();
             try {
                 JsonObject playlistJson = Json.createObjectBuilder()
@@ -84,7 +84,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
             } catch (Exception e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
             }
-            getPlaylists().putIfAbsent(name, new Playlist(name));
+            getPlaylists().put(name, new Playlist(name));
         }
     }
 
