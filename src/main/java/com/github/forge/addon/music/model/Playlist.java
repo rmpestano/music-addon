@@ -9,7 +9,7 @@ import java.util.List;
  * Created by pestano on 21/08/15.
  */
 @Vetoed
-public class Playlist implements Serializable{
+public class Playlist implements Serializable {
 
     private String name;
     private List<Song> songs;
@@ -27,23 +27,23 @@ public class Playlist implements Serializable{
 
 
     public List<Song> getSongs() {
-        if(songs == null){
+        if (songs == null) {
             songs = new ArrayList<>();
         }
         return songs;
     }
 
-    public void addSong(Song song){
-        if(songs == null){
+    public void addSong(Song song) {
+        if (songs == null) {
             songs = new ArrayList<>();
         }
-        if(!songs.contains(song)){
+        if (!songs.contains(song)) {
             songs.add(song);
         }
     }
 
     public void addSongs(List<Song> songs) {
-        if(songs == null ){
+        if (songs == null) {
             return;
         }
         for (Song song : songs) {

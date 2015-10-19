@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -43,16 +44,21 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     private Playlist currentPlaylist;
 
-	@Override
-	public Map<String, Playlist> getPlaylists() {
-		return playlists;
-	}
+
+    @Override
+    public Map<String, Playlist> getPlaylists() {
+        if(playlists == null || playlists.isEmpty()){
+            initPlayLists();
+        }
+        return playlists;
+    }
 
 	/**
 	 * initialize the Map of playlists based on playlist FORGE_HOME/playlists/
 	 * folder where each json file is a playlist.
 	 */
-	private Map<String, Playlist> initPlayLists() {
+	public void initPlayLists() {
+        playlists = new ConcurrentHashMap<>();
 		createPlaylist(DEFAULT_PLAYLIST);
 		List<JsonObject> playListsJson = getAllPlaylists();
 		for (JsonObject jsonObject : playListsJson) {
@@ -67,9 +73,9 @@ public class PlaylistManagerImpl implements PlaylistManager {
 			playlist.addSongs(songs);
 			playlists.put(playlist.getName(), playlist);
 		}
-		return playlists;
 	}
-    
+
+
     @Override
     public Playlist getPlaylist(String name) {
         return getPlaylists().get(name);

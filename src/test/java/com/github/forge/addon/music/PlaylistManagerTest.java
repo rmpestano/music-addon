@@ -45,9 +45,8 @@ public class PlaylistManagerTest extends BaseTest {
 
     @Test
     public void shouldCreateDefaultPlayList() throws Exception {
-        assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(false));
-        playlistManager.getPlaylists();//should trigger the creation of default playlist
-        assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));
+        assertThat(playlistManager.getPlaylists(),is(notNullValue()));
+        assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));//postconstruct must create default pl
         Playlist playlist = playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
         assertNotNull(playlist);
         assertEquals("default", playlist.getName());

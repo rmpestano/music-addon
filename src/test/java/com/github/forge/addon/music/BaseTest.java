@@ -1,38 +1,38 @@
 package com.github.forge.addon.music;
 
-import java.nio.file.Paths;
+import com.github.forge.addon.music.playlist.PlaylistManager;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import javax.inject.Inject;
-
-import org.junit.After;
-import org.junit.Before;
-
-import com.github.forge.addon.music.playlist.PlaylistManager;
+import java.nio.file.Paths;
 
 /**
  * Created by pestano on 17/10/15.
  */
-public abstract class BaseTest
-{
+public abstract class BaseTest {
 
-   protected static final String TEST_PLAY_LIST_NAME = "test-playlist";
+    protected static final String TEST_PLAY_LIST_NAME = "test-playlist";
 
-   @Inject
-   protected PlaylistManager playlistManager;
+    @Inject
+    protected PlaylistManager playlistManager;
 
-   protected String defaulUserHome;
+    protected static String defaulUserHome;
 
-   @Before
-   public void before()
-   {
-      defaulUserHome = System.getProperty("user.home");
-      System.setProperty("user.home", Paths.get("").toAbsolutePath().toString() + "/target");
-      playlistManager.removePlaylists();
-   }
+    @BeforeClass
+    public static void beforeClass() {
+        defaulUserHome = System.getProperty("user.home");
+        System.setProperty("user.home", Paths.get("").toAbsolutePath().toString() + "/target");
+    }
 
-   @After
-   public void after()
-   {
-      System.setProperty("user.home", defaulUserHome);
-   }
+    @Before
+    public void before() {
+        playlistManager.removePlaylists();
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        System.setProperty("user.home", defaulUserHome);
+    }
 }

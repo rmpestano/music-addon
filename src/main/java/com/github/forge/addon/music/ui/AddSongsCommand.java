@@ -1,7 +1,6 @@
 package com.github.forge.addon.music.ui;
 
 import com.github.forge.addon.music.event.AddSongEvent;
-import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
@@ -28,7 +27,6 @@ import org.jboss.forge.addon.ui.util.Metadata;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
