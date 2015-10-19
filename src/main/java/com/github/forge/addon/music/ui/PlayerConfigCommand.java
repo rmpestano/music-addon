@@ -79,7 +79,7 @@ public class PlayerConfigCommand extends AbstractUICommand {
         targetPlaylist.addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                if(valueChangeEvent.getNewValue() != null){
+                if(valueChangeEvent.getNewValue() != null && !valueChangeEvent.getNewValue().toString().equals(playlistManager.getCurrentPlaylist().getName())){
                     playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
                     playlstChanged = true;//if playlist has changed fire event
                 }

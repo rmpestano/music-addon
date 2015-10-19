@@ -1,5 +1,6 @@
 package com.github.forge.addon.music.player;
 
+import com.github.forge.addon.music.event.AddSongEvent;
 import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
@@ -305,6 +306,10 @@ public class Mp3Player implements Player {
     public void onPlaylistChanged(@Observes ChangePlaylistEvent playlistEvent) {
         playQueue = null;
         next();
+    }
+
+    public void onSongAdded(@Observes AddSongEvent addSongEvent) {
+        playQueue = null;
     }
 
 }

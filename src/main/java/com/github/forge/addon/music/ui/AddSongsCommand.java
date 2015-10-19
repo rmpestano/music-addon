@@ -1,5 +1,7 @@
 package com.github.forge.addon.music.ui;
 
+import com.github.forge.addon.music.event.AddSongEvent;
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
@@ -24,6 +26,7 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
@@ -37,9 +40,10 @@ public class AddSongsCommand extends AbstractUICommand {
     @Inject
     PlaylistManager playlistManager;
 
+    @Inject
+    Event<AddSongEvent> addSongEvent;
 
     private DirectoryResource lastSelectedDir;
-
 
     @Inject
     @WithAttributes(label = "Target playlist", description = "Playlist which songs will be added", required = true, type = InputType.DROPDOWN)
@@ -49,17 +53,15 @@ public class AddSongsCommand extends AbstractUICommand {
     @WithAttributes(label = "Select dir", description = "Add songs by dir")
     private UIInput<DirectoryResource> dir;
 
-
     @Inject
     @WithAttributes(label = "Select songs", description = "Add songs from any dir")
     private UIInputMany<FileResource<?>> songs;
 
-
     @Override
     public UICommandMetadata getMetadata(UIContext context) {
         return Metadata.forCommand(AddSongsCommand.class).name("Music: Add songs")
-                .description("Add songs into a playlist")
-                .category(Categories.create("Music"));
+            .description("Add songs into a playlist")
+            .category(Categories.create("Music"));
     }
 
     @Override
@@ -82,7 +84,6 @@ public class AddSongsCommand extends AbstractUICommand {
             }
         });
 
-
     }
 
     @Override
@@ -99,6 +100,7 @@ public class AddSongsCommand extends AbstractUICommand {
         Playlist plList = playlistManager.getPlaylist(targetPlaylist.getValue().toString());
         plList.addSongs(songsToAdd);
         playlistManager.savePlaylist(plList);
+        addSongEvent.fire(new AddSongEvent());
         int numSongsAdded = songsToAdd.size();
         songsToAdd.clear();
         songs.setValue(null);
