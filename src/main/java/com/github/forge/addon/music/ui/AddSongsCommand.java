@@ -59,7 +59,7 @@ public class AddSongsCommand extends AbstractUICommand {
     public UICommandMetadata getMetadata(UIContext context) {
         return Metadata.forCommand(AddSongsCommand.class).name("Music: Add songs")
                 .description("Add songs into a playlist")
-                .category(Categories.create("music"));
+                .category(Categories.create("Music"));
     }
 
     @Override

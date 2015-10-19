@@ -15,7 +15,6 @@ public interface Player {
     void play();
 
 
-
     /**
      * pauses current song
      */
@@ -31,6 +30,8 @@ public interface Player {
     boolean isRepeat();
 
     boolean isShuffle();
+
+    boolean isGenerateStatistics();
 
     /**
      * shuffles queued songs
@@ -65,6 +66,9 @@ public interface Player {
      * @param repeat
      */
     void setRepeat(boolean repeat);
+
+
+    void setGenerateStatistics(boolean generateStatistics);
 
     boolean isPlaying();
 

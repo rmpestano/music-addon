@@ -3,9 +3,7 @@ package com.github.forge.addon.music.ui;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
-import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
-import org.jboss.forge.addon.resource.Resource;
 import org.jboss.forge.addon.resource.ResourceFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -55,7 +53,7 @@ public class EditPlaylistCommand extends AbstractUICommand {
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(EditPlaylistCommand.class).name("Music: Edit playlist")
 				.description("Add or remove songs of selected playlist")
-				.category(Categories.create("music"));
+				.category(Categories.create("Music"));
 	}
 
 	@Override
@@ -72,7 +70,6 @@ public class EditPlaylistCommand extends AbstractUICommand {
 			public void valueChanged(ValueChangeEvent valueChangeEvent) {
 				String selectedPlaylist = valueChangeEvent.getNewValue().toString();
 				Playlist playlist = playlistManager.getPlaylist(selectedPlaylist);
-				playlistManager.setCurrentPlaylist(playlist);
 				songs.setValue(createSongResources(playlist.getSongs()));
 			}
 		});

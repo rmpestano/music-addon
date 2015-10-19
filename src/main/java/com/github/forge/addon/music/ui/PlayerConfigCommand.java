@@ -46,7 +46,7 @@ public class PlayerConfigCommand extends AbstractUICommand {
 
 
     @Inject
-    @WithAttributes(label = "Select playlist", description = "Playlist to edit", required = true, type = InputType.DROPDOWN)
+    @WithAttributes(label = "Select playlist", description = "Current playlist", required = true, type = InputType.DROPDOWN)
     private UISelectOne<String> targetPlaylist;
 
     @Inject
@@ -54,8 +54,12 @@ public class PlayerConfigCommand extends AbstractUICommand {
     private UIInput<Boolean> shuffle;
 
     @Inject
-    @WithAttributes(label = "Repeat", description = "if true the play queue will not removed played songs from the queue")
+    @WithAttributes(label = "Repeat", description = "if true the play queue will not remove played songs from the queue")
     private UIInput<Boolean> repeat;
+
+    @Inject
+    @WithAttributes(label = "Generate statistics", description = "Generate statistics of played songs at FORGE_HOME that can be shared using 'Music: export statistics' command")
+    private UIInput<Boolean> songStatistics;
 
 
     @Override
@@ -75,7 +79,6 @@ public class PlayerConfigCommand extends AbstractUICommand {
         targetPlaylist.addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                Playlist currentPlaylist = playlistManager.getCurrentPlaylist();
                 if(valueChangeEvent.getNewValue() != null){
                     playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
                     playlstChanged = true;//if playlist has changed fire event
@@ -100,7 +103,18 @@ public class PlayerConfigCommand extends AbstractUICommand {
             }
         });
 
-        uiBuilder.add(targetPlaylist).add(shuffle).add(repeat);
+
+        songStatistics.setDefaultValue(player.isGenerateStatistics());
+
+        songStatistics.addValueChangeListener(new ValueChangeListener() {
+            @Override
+            public void valueChanged(ValueChangeEvent valueChangeEvent) {
+                player.setGenerateStatistics((Boolean) valueChangeEvent.getNewValue());
+            }
+        });
+
+
+        uiBuilder.add(targetPlaylist).add(shuffle).add(repeat).add(songStatistics);
     }
 
     @Override

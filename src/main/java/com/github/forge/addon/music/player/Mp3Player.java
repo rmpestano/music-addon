@@ -4,6 +4,7 @@ import com.github.forge.addon.music.event.ChangePlaylistEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.github.forge.addon.music.statistics.StatisticsManager;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
@@ -37,9 +38,14 @@ public class Mp3Player implements Player {
     @Inject
     private PlaylistManager playlistManager;
 
+    @Inject
+    private StatisticsManager statisticsManager;
+
     private boolean shuffle;
 
     private boolean repeat;
+
+    private boolean generateStatistics = true;
 
     private List<Song> playQueue;
 
@@ -99,6 +105,13 @@ public class Mp3Player implements Player {
             jplayer.setPlayBackListener(new PlaybackListener() {
                 @Override
                 public void playbackFinished(PlaybackEvent evt) {
+                    try {
+                        if(isGenerateStatistics()){
+                            statisticsManager.addStatistic(currentSong);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     next();
                 }
             });
@@ -223,6 +236,11 @@ public class Mp3Player implements Player {
         return shuffle;
     }
 
+    @Override
+    public boolean isGenerateStatistics() {
+        return this.generateStatistics;
+    }
+
 
     @Override
     public void shuffle() {
@@ -262,6 +280,11 @@ public class Mp3Player implements Player {
     @Override
     public void setRepeat(boolean repeat) {
         this.repeat = repeat;
+    }
+
+    @Override
+    public void setGenerateStatistics(boolean generateStatistics) {
+        this.generateStatistics = generateStatistics;
     }
 
     private List<Song> getAllSongs() {

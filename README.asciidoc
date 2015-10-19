@@ -3,5 +3,66 @@ Brings music to your IDE!
 
 image:https://travis-ci.org/rmpestano/music-addon.svg[Build Status (Travis CI), link=https://travis-ci.org/rmpestano/music-addon]
 image:https://coveralls.io/repos/rmpestano/music-addon/badge.svg?branch=master&service=github[Coverage, link=https://coveralls.io/r/rmpestano/music-addon] 
-     
+
+=== Dependencies:
+None
+
+=== Installation
+
+Use install addon from git command:
+
+----
+addon-install-from-git --url https://github.com/rmpestano/music-addon.git
+----
+
+=== Features
+
+* Plays music directly from your IDE;
+* Create play lists based on your songs;
+
+=== Usage
+
+This forge addon provides the following commands:
+
+image::commands.png["addon commands"]
+
+Below is a brief description of each command:
+
+. Create a playlist using the command:
++
+----
+ Music: New playlist
+----
+. Add songs into the playlist using the command:
++
+----
+ Music: Add songs
+----
++
+image::add-songs.png["add songs", scaledwidth="70%"]
++
+NOTE: You can either select a directory (the search is recursive) or specific files.
++
+.. You can also use the command:
++
+----
+Music: Edit playlist
+----
++
+image::edit-playlist.png["edit playlist", scaledwidth="60%"]
++
+But in this case you can only add(and remove) files and not directories.
+. Configure the player by selecting current playlist using the command:
++
+----
+Music: Player config
+----
++
+image::player-config.png["player config", scaledwidth="75%"]
++
+. Now your are ready to play songs inside your favourite IDE:
++
+image::play.png["Now playing...", scaledwidth="70%"]
+
+
 
