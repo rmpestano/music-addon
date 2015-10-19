@@ -26,7 +26,7 @@ public class StopCommand extends AbstractUICommand {
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(StopCommand.class)
-				.description("Stops the player").name("Music: stop")
+				.description("Stops the player").name("Music: Stop")
 				.category(Categories.create("Music"));
 	}
 

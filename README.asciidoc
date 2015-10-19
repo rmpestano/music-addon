@@ -19,6 +19,7 @@ addon-install-from-git --url https://github.com/rmpestano/music-addon.git
 
 * Plays music directly from your IDE;
 * Create play lists based on your songs;
+* Generate statistics of played songs (which can be shared later);
 
 === Usage
 
@@ -26,7 +27,7 @@ This forge addon provides the following commands:
 
 image::commands.png["addon commands"]
 
-Below is a brief description of each command:
+Below is a brief description of the main commands needed to get you started:
 
 . Create a playlist using the command:
 +

@@ -120,7 +120,7 @@ public class StatisticsManager {
      * should persist to local json statistics file on every 10 played songs
      */
     private boolean shouldPersistStatistics() {
-        if(playStatistics.size() >=1){
+        if(playStatistics.size() >=10){
             return true;
         }
         int countSum = 0;

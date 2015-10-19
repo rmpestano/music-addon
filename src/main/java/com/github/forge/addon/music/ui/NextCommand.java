@@ -27,7 +27,7 @@ public class NextCommand extends AbstractUICommand {
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(NextCommand.class)
-				.description("Plays the next song").name("Music: next")
+				.description("Plays the next song").name("Music: Next")
 				.category(Categories.create("Music"));
 	}
 
