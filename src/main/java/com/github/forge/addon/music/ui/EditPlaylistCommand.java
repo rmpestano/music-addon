@@ -1,11 +1,13 @@
 package com.github.forge.addon.music.ui;
 
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.playlist.PlaylistManager;
-import org.jboss.forge.addon.resource.DirectoryResource;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.jboss.forge.addon.resource.FileResource;
-import org.jboss.forge.addon.resource.Resource;
 import org.jboss.forge.addon.resource.ResourceFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -24,14 +26,10 @@ import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.playlist.PlaylistManager;
 
-@Singleton
 public class EditPlaylistCommand extends AbstractUICommand {
 
 	@Inject
@@ -40,22 +38,18 @@ public class EditPlaylistCommand extends AbstractUICommand {
 	@Inject
 	ResourceFactory resourceFactory;
 
-
 	@Inject
 	@WithAttributes(label = "Target playlist", description = "Playlist to edit", required = true, type = InputType.DROPDOWN)
 	private UISelectOne<String> targetPlaylist;
-
 
 	@Inject
 	@WithAttributes(label = "Playlist songs", description = "Playlist songs")
 	private UIInputMany<FileResource<?>> songs;
 
-
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(EditPlaylistCommand.class).name("Music: Edit playlist")
-				.description("Add or remove songs of selected playlist")
-				.category(Categories.create("music"));
+				.description("Add or remove songs of selected playlist").category(Categories.create("music"));
 	}
 
 	@Override
@@ -86,7 +80,7 @@ public class EditPlaylistCommand extends AbstractUICommand {
 		List<FileResource<?>> songsResources = new ArrayList<>();
 		for (Song playlistSong : playlistSongs) {
 			File file = new File(playlistSong.getLocation());
-			if(file.exists()){
+			if (file.exists()) {
 				songsResources.add(resourceFactory.create(FileResource.class, file));
 			}
 		}
@@ -96,12 +90,11 @@ public class EditPlaylistCommand extends AbstractUICommand {
 	@Override
 	public Result execute(UIExecutionContext context) throws Exception {
 
-
-		if(songs.getValue() != null){
+		if (songs.getValue() != null) {
 			List<Song> playlistSongs = new ArrayList<>();
 			for (FileResource<?> songFile : songs.getValue()) {
-				if(songFile.getName().toLowerCase().endsWith(".mp3")){
-					if(songFile.exists()){
+				if (songFile.getName().toLowerCase().endsWith(".mp3")) {
+					if (songFile.exists()) {
 						Song song = new Song(songFile.getFullyQualifiedName());
 						playlistSongs.add(song);
 					}
@@ -117,14 +110,12 @@ public class EditPlaylistCommand extends AbstractUICommand {
 		return Results.success("Playlist updated successfully");
 	}
 
-
 	@Override
 	public void validate(UIValidationContext validator) {
 		super.validate(validator);
 		for (FileResource<?> fileResource : songs.getValue()) {
-			if(!fileResource.getName().toLowerCase().endsWith(".mp3")){
-				validator.addValidationError(songs,
-						"Songs must be in mp3 format");
+			if (!fileResource.getName().toLowerCase().endsWith(".mp3")) {
+				validator.addValidationError(songs, "Songs must be in mp3 format");
 			}
 		}
 
