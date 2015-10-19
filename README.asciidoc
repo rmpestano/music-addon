@@ -21,6 +21,12 @@ addon-install-from-git --url https://github.com/rmpestano/music-addon.git
 * Create play lists based on your songs;
 * Generate statistics of played songs (which can be shared later);
 
+=== Demo
+
+
+image:http://img.youtube.com/vi/reEV20_DSqE/0.jpg[Demo, link=https://www.youtube.com/watch?v=reEV20_DSqE, window="_blank"]
+
+
 === Usage
 
 This forge addon provides the following commands:
