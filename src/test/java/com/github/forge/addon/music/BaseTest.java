@@ -1,35 +1,38 @@
 package com.github.forge.addon.music;
 
-import com.github.forge.addon.music.playlist.PlaylistManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import java.nio.file.Paths;
 
 import javax.inject.Inject;
-import java.nio.file.Paths;
+
+import org.junit.After;
+import org.junit.Before;
+
+import com.github.forge.addon.music.playlist.PlaylistManager;
 
 /**
  * Created by pestano on 17/10/15.
  */
-@Ignore
-public class BaseTest {
+public abstract class BaseTest
+{
 
-    protected static final String TEST_PLAY_LIST_NAME = "test-playlist";
+   protected static final String TEST_PLAY_LIST_NAME = "test-playlist";
 
-    @Inject
-    protected PlaylistManager playlistManager;
+   @Inject
+   protected PlaylistManager playlistManager;
 
-    protected String defaulUserHome;
+   protected String defaulUserHome;
 
-    @Before
-    public void before() {
-        defaulUserHome = System.getProperty("user.home");
-        System.setProperty("user.home", Paths.get("").toAbsolutePath().toString() + "/target");
-        playlistManager.removePlaylists();
-    }
+   @Before
+   public void before()
+   {
+      defaulUserHome = System.getProperty("user.home");
+      System.setProperty("user.home", Paths.get("").toAbsolutePath().toString() + "/target");
+      playlistManager.removePlaylists();
+   }
 
-    @After
-    public void after() {
-        System.setProperty("user.home", defaulUserHome);
-    }
+   @After
+   public void after()
+   {
+      System.setProperty("user.home", defaulUserHome);
+   }
 }

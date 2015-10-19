@@ -1,21 +1,31 @@
 package com.github.forge.addon.music.playlist;
 
-import com.github.forge.addon.music.model.Current;
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.util.Utils;
-import org.jboss.forge.addon.resource.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.json.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+
+import org.jboss.forge.addon.resource.DirectoryResource;
+import org.jboss.forge.addon.resource.FileResource;
+import org.jboss.forge.addon.resource.Resource;
+import org.jboss.forge.addon.resource.ResourceFactory;
+import org.jboss.forge.addon.resource.ResourceFilter;
+
+import com.github.forge.addon.music.model.Current;
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.util.Utils;
 
 /**
  * Created by pestano on 21/08/15.
@@ -33,37 +43,33 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     private Playlist currentPlaylist;
 
-    public Map<String, Playlist> getPlaylists() {
-        if (playlists == null || playlists.isEmpty()) {
-            playlists = initPlayLists();
-        }
-        return playlists;
-    }
+	@Override
+	public Map<String, Playlist> getPlaylists() {
+		return playlists;
+	}
 
-    /**
-     * initialize the Map of playlists based on playlist FORGE_HOME/playlists/ folder
-     * where each json file is a playlist.
-     */
-    private Map<String, Playlist> initPlayLists() {
-        createPlaylist(DEFAULT_PLAYLIST);
-        List<JsonObject> playListsJson = getAllPlaylists();
-        playlists = new HashMap<>();
-        for (JsonObject jsonObject : playListsJson) {
-            Playlist playlist = new Playlist(jsonObject.getString("name"));
-            JsonArray jsonSongs = jsonObject.getJsonArray("songs");
-            List<Song> songs = new ArrayList<>();
-            for (JsonValue jsonSong : jsonSongs) {
-                JsonObject songObject = (JsonObject) jsonSong;
-                Song song = new Song(songObject.getString("location"));
-                songs.add(song);
-            }
-            playlist.addSongs(songs);
-            playlists.put(playlist.getName(), playlist);
-        }
-        return playlists;
-    }
-
-
+	/**
+	 * initialize the Map of playlists based on playlist FORGE_HOME/playlists/
+	 * folder where each json file is a playlist.
+	 */
+	private Map<String, Playlist> initPlayLists() {
+		createPlaylist(DEFAULT_PLAYLIST);
+		List<JsonObject> playListsJson = getAllPlaylists();
+		for (JsonObject jsonObject : playListsJson) {
+			Playlist playlist = new Playlist(jsonObject.getString("name"));
+			JsonArray jsonSongs = jsonObject.getJsonArray("songs");
+			List<Song> songs = new ArrayList<>();
+			for (JsonValue jsonSong : jsonSongs) {
+				JsonObject songObject = (JsonObject) jsonSong;
+				Song song = new Song(songObject.getString("location"));
+				songs.add(song);
+			}
+			playlist.addSongs(songs);
+			playlists.put(playlist.getName(), playlist);
+		}
+		return playlists;
+	}
+    
     @Override
     public Playlist getPlaylist(String name) {
         return getPlaylists().get(name);
@@ -71,7 +77,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     @Override
     public void createPlaylist(String name) {
-        if (!hasPlaylist(name) && !getPlaylists().containsKey(name)) {
+        if (!hasPlaylist(name)) {
             DirectoryResource playlistHomeDir = getPlayListHomeDir();
             try {
                 JsonObject playlistJson = Json.createObjectBuilder()
@@ -84,7 +90,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
             } catch (Exception e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
             }
-            getPlaylists().put(name, new Playlist(name));
+            getPlaylists().putIfAbsent(name, new Playlist(name));
         }
     }
 

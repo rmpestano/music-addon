@@ -3,7 +3,9 @@ package com.github.forge.addon.music.ui;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
+import org.jboss.forge.addon.resource.Resource;
 import org.jboss.forge.addon.resource.ResourceFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -29,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Singleton
 public class EditPlaylistCommand extends AbstractUICommand {
 
 	@Inject
@@ -83,7 +84,7 @@ public class EditPlaylistCommand extends AbstractUICommand {
 		List<FileResource<?>> songsResources = new ArrayList<>();
 		for (Song playlistSong : playlistSongs) {
 			File file = new File(playlistSong.getLocation());
-			if(file.exists()){
+			if (file.exists()) {
 				songsResources.add(resourceFactory.create(FileResource.class, file));
 			}
 		}
