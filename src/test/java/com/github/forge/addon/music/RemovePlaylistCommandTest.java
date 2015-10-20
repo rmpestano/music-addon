@@ -52,7 +52,7 @@ public class RemovePlaylistCommandTest extends BaseTest{
         String playlist = UUID.randomUUID().toString();
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\nN", 10, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\nn", 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
