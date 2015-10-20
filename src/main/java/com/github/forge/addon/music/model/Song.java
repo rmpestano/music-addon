@@ -40,6 +40,9 @@ public class Song implements Serializable{
         if (title == null) {
             try {
                 title = loadTitle();
+                if(title == null){
+                    title = "";
+                }
             } catch (Exception e) {
                 title = "";
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song title from file:" + location, e);
@@ -52,6 +55,9 @@ public class Song implements Serializable{
         if (year == null) {
             try {
                 year = loadYear();
+                if(year == null){
+                    year = "";
+                }
             } catch (Exception e) {
                 year = "";
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song year from file:" + location, e);
@@ -64,6 +70,9 @@ public class Song implements Serializable{
         if (genre == null) {
             try {
                 genre = loadGenre();
+                if(genre == null){
+                    genre = "";
+                }
             } catch (Exception e) {
                 genre = "";
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song genre from file:" + location, e);
@@ -76,6 +85,9 @@ public class Song implements Serializable{
         if (album == null) {
             try {
                 album = loadAlbum();
+                if(album == null){
+                    album = "";
+                }
             } catch (Exception e) {
                 album = "";
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song album from file:" + location, e);
@@ -88,12 +100,29 @@ public class Song implements Serializable{
         if (duration == null) {
             try {
                 duration = loadDuration();
+                if(duration == null){
+                    duration = "";
+                }
             } catch (Exception e) {
                 duration = "";
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not read song duration from file:" + location, e);
             }
         }
         return duration;
+    }
+
+    public String getArtist() {
+        if (artist == null) {
+            try {
+                artist = loadArtist();
+                if(artist == null){
+                    artist = "";
+                }
+            } catch (Exception e) {
+                artist = "";
+            }
+        }
+        return artist;
     }
 
 
@@ -133,16 +162,7 @@ public class Song implements Serializable{
         }
     }
 
-    public String getArtist() {
-        if (artist == null) {
-            try {
-                artist = loadArtist();
-            } catch (Exception e) {
-                artist = "";
-            }
-        }
-        return artist;
-    }
+
 
     private String loadArtist() {
         Mp3File mp3 = getMp3File();
