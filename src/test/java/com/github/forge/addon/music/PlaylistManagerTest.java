@@ -87,7 +87,7 @@ public class PlaylistManagerTest extends BaseTest {
         JsonArray songsArray = defaultPlayList.getJsonArray("songs");
         assertThat(songsArray, is(notNullValue()));
         assertThat(songsArray.size(), is(equalTo(1)));
-        assertThat(((JsonObject) songsArray.get(0)).getString("title"), is(equalTo("Axe Of Judgement")));
+        assertThat(((JsonObject) songsArray.get(0)).getString("location"), is(equalTo(Paths.get("target/test-classes").toAbsolutePath() + "/axe.mp3")));
     }
 
     @Test

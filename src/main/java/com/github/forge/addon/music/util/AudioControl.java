@@ -31,7 +31,7 @@ public class AudioControl {
     }
 
     public static boolean isAudioEnabled() {
-        return getMasterOutputLine() != null;
+        return getMasterOutputLine()!= null && getMasterOutputVolume() != null;
     }
 
 
