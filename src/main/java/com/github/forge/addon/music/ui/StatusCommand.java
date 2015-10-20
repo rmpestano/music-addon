@@ -34,7 +34,7 @@ public class StatusCommand extends AbstractUICommand {
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(StatusCommand.class)
 				.name("Music: Status")
-				.description("Show which song is playing (if any), song length, time left and play queue")
+				.description("Show which song is playing, song length, time played and next song")
 				.category(Categories.create("Music"));
 	}
 
