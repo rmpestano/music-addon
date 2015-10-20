@@ -99,7 +99,6 @@ public class PlaylistManagerImpl implements PlaylistManager {
                 FileResource<?> playListFile = playlistHomeDir.getChild(name + ".json").reify(FileResource.class);
                 playListFile.createNewFile();
                 playListFile.setContents(playlistJson.toString());
-
             } catch (Exception e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Could not create playlist.", e);
             }
@@ -197,10 +196,11 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @Override
     public void removePlaylist(String name) {
         Resource<?> playList = getPlayListHomeDir().getChild(name + ".json");
+      boolean deleted = false;
         if (playList.exists()) {
-            playList.delete();
+            deleted = playList.delete();
         }
-        if (playlists != null) {
+        if (deleted && playlists != null) {
             playlists.remove(name);
         }
     }

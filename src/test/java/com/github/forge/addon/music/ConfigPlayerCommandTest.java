@@ -74,7 +74,7 @@ public class ConfigPlayerCommandTest extends BaseTest{
         assertThat(player.isShuffle(),is(false));
         assertThat(player.isRepeat(),is(false));
         Result result = shellTest.execute("music-player-config --playlist " + PlaylistManager.DEFAULT_PLAYLIST
-                +" --repeat y --shuffle y" , 10, TimeUnit.SECONDS);
+                +" --repeat Y --shuffle Y" , 15, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
