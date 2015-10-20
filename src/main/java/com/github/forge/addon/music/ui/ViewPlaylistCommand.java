@@ -1,5 +1,6 @@
 package com.github.forge.addon.music.ui;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -49,6 +50,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 	public UICommandMetadata getMetadata(UIContext context) {
 		return Metadata.forCommand(ViewPlaylistCommand.class).description("View playlist songs")
 				.name("Music: View playlist").category(Categories.create("Music"));
+
 	}
 
 	@Override
@@ -86,14 +88,6 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 			}
 		});
 
-		songs.addValidator(new UIValidator() {
-			@Override
-			public void validate(UIValidationContext uiValidationContext) {
-				uiValidationContext.addValidationError(songs,
-						"Any change to the list will not be persisted.\n Use 'playlist edit' command instead.");
-			}
-		});
-
 	}
 
 	private List<String> getFormatedPlaylistSongs(String playlistName) {
@@ -112,7 +106,17 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-		return Results.success("View playlist command executed with success!");
+	   if(!uiExecutionContext.getUIContext().getProvider().isGUI()){
+			 List<String> formatedPlaylistSongs = getFormatedPlaylistSongs(playlist.getValue());
+			 PrintStream out = uiExecutionContext.getUIContext().getProvider().getOutput().out();
+			 out.println(formatedPlaylistSongs.size() + " songs found on playlist: "+playlist.getValue());
+			 int i = 1;
+			 for (String song : formatedPlaylistSongs) {
+					out.println(i+"- "+song);
+				  i++;
+			 }
+		 }
+		return Results.success("Command executed successfully!");
 	}
 
 }
