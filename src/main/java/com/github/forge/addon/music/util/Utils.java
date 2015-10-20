@@ -35,4 +35,8 @@ public class Utils {
         return forgeHome;
     }
 
+    public static String newLine(){
+        return System.getProperty("line.separator");
+    }
+
 }

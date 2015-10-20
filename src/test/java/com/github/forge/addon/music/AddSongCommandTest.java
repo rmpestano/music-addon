@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +65,7 @@ public class AddSongCommandTest extends BaseTest {
 		assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));
 		Playlist playlist = playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
 		assertNotNull(playlist);
-		Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() + "/axe.mp3");
+		Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() + File.separator+"axe.mp3");
 		assertThat(playlist.getSongs(), hasItem(song));
 
 	}

@@ -1,11 +1,17 @@
 package com.github.forge.addon.music.player;
 
-import com.github.forge.addon.music.event.AddSongEvent;
-import com.github.forge.addon.music.event.ChangePlaylistEvent;
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.playlist.PlaylistManager;
-import com.github.forge.addon.music.statistics.StatisticsManager;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
@@ -18,17 +24,13 @@ import javazoom.jl.player.advanced.PlaybackListener;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.github.forge.addon.music.event.AddSongEvent;
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.github.forge.addon.music.statistics.StatisticsManager;
 
 /**
  * Created by pestano on 15/10/15.
@@ -79,8 +81,9 @@ public class Mp3Player implements Player {
             try {
                 createAudioDevice();
                 runPlayerThread();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+            }catch (Exception e){
+                Logger.getLogger(getClass().getName()).warning("Could not play song at location: "+currentSong.getLocation() + " \nmessage:"+e.getMessage() +"\ncause:"+e.getMessage()) ;
+                next();
             }
         }
 

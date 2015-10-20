@@ -96,8 +96,8 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 				: currentPlaylist.getSongs();
 		List<String> songsUIValue = new LinkedList<>();
 		for (Song playlistSong : playlistSongs) {
-			String uiValue = playlistSong.getArtist() + " - " + playlistSong.getAlbum() + " - "
-					+ playlistSong.getTitle();
+			String uiValue = (!"".equals(playlistSong.getArtist()) ? playlistSong.getArtist():"no artist") + " - " + (!"".equals(playlistSong.getAlbum()) ? playlistSong.getAlbum():"no album found") + " - "
+					+ ((!"".equals(playlistSong.getTitle())) ? playlistSong.getTitle():"no title found for file "+playlistSong.getLocation());
 			songsUIValue.add(uiValue);
 		}
 		Collections.sort(songsUIValue);
@@ -112,7 +112,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 			 out.println(formatedPlaylistSongs.size() + " songs found on playlist: "+playlist.getValue());
 			 int i = 1;
 			 for (String song : formatedPlaylistSongs) {
-					out.println(i+"- "+song);
+				 out.println(i+"- "+song);
 				  i++;
 			 }
 		 }

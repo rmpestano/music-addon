@@ -7,6 +7,16 @@
 
 package com.github.forge.addon.music;
 
+import static com.github.forge.addon.music.util.Utils.newLine;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.shell.test.ShellTest;
@@ -18,14 +28,6 @@ import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.inject.Inject;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -52,7 +54,7 @@ public class RemovePlaylistCommandTest extends BaseTest{
         String playlist = UUID.randomUUID().toString();
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\nn", 10, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist + newLine() +"n", 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
@@ -67,7 +69,7 @@ public class RemovePlaylistCommandTest extends BaseTest{
         String playlist = UUID.randomUUID().toString();
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\n Y", 10, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist + newLine()+"Y", 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }

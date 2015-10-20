@@ -45,6 +45,9 @@ public class PlayCommand extends AbstractUICommand {
 		if(player.isPlaying()){
 			return Results.success("Player is already playing. Use next command to change song.");
 		}else{
+			if(player.getPlayQueue() == null || player.getPlayQueue().isEmpty()){
+				return Results.fail("No songs to play, use music-add-songs command");
+			}
 			player.play();
 			Song song = player.getCurrentSong();
 			return Results.success("Now playing: "+song.info());

@@ -7,21 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import javax.json.*;
 
-import org.jboss.forge.addon.resource.DirectoryResource;
-import org.jboss.forge.addon.resource.FileResource;
-import org.jboss.forge.addon.resource.Resource;
-import org.jboss.forge.addon.resource.ResourceFactory;
-import org.jboss.forge.addon.resource.ResourceFilter;
+import org.jboss.forge.addon.resource.*;
 
 import com.github.forge.addon.music.model.Current;
 import com.github.forge.addon.music.model.Playlist;
@@ -58,22 +49,38 @@ public class PlaylistManagerImpl implements PlaylistManager {
 	 * folder where each json file is a playlist.
 	 */
 	public void initPlayLists() {
-        playlists = new ConcurrentHashMap<>();
+    playlists = new ConcurrentHashMap<>();
 		createPlaylist(DEFAULT_PLAYLIST);
 		List<JsonObject> playListsJson = getAllPlaylists();
 		for (JsonObject jsonObject : playListsJson) {
-			Playlist playlist = new Playlist(jsonObject.getString("name"));
-			JsonArray jsonSongs = jsonObject.getJsonArray("songs");
-			List<Song> songs = new ArrayList<>();
-			for (JsonValue jsonSong : jsonSongs) {
-				JsonObject songObject = (JsonObject) jsonSong;
-				Song song = new Song(songObject.getString("location"));
-				songs.add(song);
-			}
-			playlist.addSongs(songs);
+			Playlist playlist = parsePlaylist(jsonObject);
 			playlists.put(playlist.getName(), playlist);
 		}
 	}
+
+  @Override
+  public void initPlaylist(String name){
+       playlists.remove(name);
+       playlists.put(name,parsePlaylist(loadPlaylist(name)));
+  }
+
+  public Playlist parsePlaylist(JsonObject jsonObject){
+        if(jsonObject == null){
+            return null;
+        }
+        Playlist playlist = new Playlist(jsonObject.getString("name"));
+        JsonArray jsonSongs = jsonObject.getJsonArray("songs");
+        List<Song> songs = new ArrayList<>();
+        for (JsonValue jsonSong : jsonSongs) {
+            JsonObject songObject = (JsonObject) jsonSong;
+            Song song = new Song(songObject.getString("location"));
+            songs.add(song);
+        }
+        playlist.addSongs(songs);
+
+      return playlist;
+
+   }
 
 
     @Override
@@ -109,12 +116,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Song song : playlist.getSongs()) {
             arrayBuilder.add(Json.createObjectBuilder().
-                            add("title", song.getTitle()).
-                            add("album", song.getAlbum()).
-                            add("artist", song.getArtist()).
-                            add("genre", song.getGenre()).
-                            add("location", song.getLocation()).
-                            add("year", song.getYear()).build()
+                            add("location", song.getLocation())
             );
         }
         JsonArray songs = arrayBuilder.build();

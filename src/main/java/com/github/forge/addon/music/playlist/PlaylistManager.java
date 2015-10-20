@@ -20,6 +20,12 @@ public interface PlaylistManager extends Serializable{
     Playlist getCurrentPlaylist();
 
     /**
+     * initializes given playlist by reading the json content in FORGE_HOME/playlists/name.json
+     * @param name
+     */
+    void initPlaylist(String name);
+
+    /**
      * get playList object in memory
      * @param name
      * @return
