@@ -198,6 +198,10 @@ public class Mp3Player implements Player {
             } catch (IOException e) {
                 //FIXME log ex
                 e.printStackTrace();
+            } finally {
+                if(generateStatistics){
+                    statisticsManager.persistStatistics();
+                }
             }
         }
     }
