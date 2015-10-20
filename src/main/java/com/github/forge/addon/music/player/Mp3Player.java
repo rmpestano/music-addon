@@ -70,7 +70,6 @@ public class Mp3Player implements Player {
 
     private Thread playerThread;
 
-
     @Override
     public void play() {
         if (!isPlaying()) {
@@ -268,6 +267,9 @@ public class Mp3Player implements Player {
 
     @Override
     public List<Song> getPlayQueue() {
+        if(playQueue == null){
+            initPlayQueue();
+        }
         return playQueue;
     }
 
