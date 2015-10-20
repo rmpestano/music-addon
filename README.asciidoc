@@ -71,5 +71,29 @@ image::player-config.png["player config", scaledwidth="75%"]
 +
 image::play.png["Now playing...", scaledwidth="70%"]
 
+=== Other commands
+
+* Status
++
+----
+Music: Status
+----
+Shows information of current playing song and next song
++
+image::status.png["Status", scaledwidth="80%"]
+
+* Next
++
+----
+Music: Next
+----
+Plays next song in play queue
+
+* Shuffle
++
+----
+Music: Shuffle
+----
+Shuffles playing queue
 
 
