@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.github.forge.addon.music.util.StopWatch;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
@@ -31,6 +32,8 @@ import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import com.github.forge.addon.music.statistics.StatisticsManager;
+import org.apache.commons.lang.time.DurationFormatUtils;
+import org.jboss.forge.addon.ui.context.UIContext;
 
 /**
  * Created by pestano on 15/10/15.
@@ -43,6 +46,9 @@ public class Mp3Player implements Player {
 
     @Inject
     private StatisticsManager statisticsManager;
+
+    @Inject
+    StopWatch stopWatch;
 
     private boolean shuffle;
 
@@ -70,6 +76,8 @@ public class Mp3Player implements Player {
 
     private Thread playerThread;
 
+    private UIContext uiContext;
+
     @Override
     public void play() {
         if (!isPlaying()) {
@@ -78,6 +86,7 @@ public class Mp3Player implements Player {
                 return;
             }
             try {
+                stopWatch.start();
                 createAudioDevice();
                 runPlayerThread();
             }catch (Exception e){
@@ -116,6 +125,15 @@ public class Mp3Player implements Player {
                         e.printStackTrace();
                     }
                     next();
+                    if(uiContext != null && currentSong != null){
+                        String msg = "Now playing: "+currentSong.info();
+                        if(uiContext.getProvider().isGUI()){
+                            uiContext.getProvider().getOutput().info(uiContext.getProvider().getOutput().out(),msg);
+                        }else{
+                            uiContext.getProvider().getOutput().out().println(msg);
+                        }
+
+                    }
                 }
             });
         } catch (Exception e) {
@@ -124,6 +142,10 @@ public class Mp3Player implements Player {
         }
     }
 
+    @Override
+    public void setUiContext(UIContext uiContext) {
+        this.uiContext = uiContext;
+    }
 
     private void runPlayerThread() throws JavaLayerException {
         if (executor == null || executor.isTerminated() || executor.isShutdown()) {
@@ -305,6 +327,15 @@ public class Mp3Player implements Player {
         return allSongs;
     }
 
+    @Override
+    public String getPlayingTime(){
+        if(isPlaying()){
+            return DurationFormatUtils.formatDuration(stopWatch.getMilliseconds(), "m:ss");
+        }
+        else{
+            return "";
+        }
+    }
 
     @Override
     public boolean isPlaying() {

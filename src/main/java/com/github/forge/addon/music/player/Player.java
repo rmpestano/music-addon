@@ -1,6 +1,7 @@
 package com.github.forge.addon.music.player;
 
 import com.github.forge.addon.music.model.Song;
+import org.jboss.forge.addon.ui.context.UIContext;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public interface Player {
      */
     void play();
 
+    void setUiContext(UIContext uiContext);
 
     /**
      * pauses current song
@@ -69,6 +71,12 @@ public interface Player {
 
 
     void setGenerateStatistics(boolean generateStatistics);
+
+    /**
+     *
+     * @return current song playing time
+     */
+    String getPlayingTime();
 
     boolean isPlaying();
 

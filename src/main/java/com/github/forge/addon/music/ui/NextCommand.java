@@ -38,7 +38,7 @@ public class NextCommand extends AbstractUICommand {
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext)
 			throws Exception {
-
+		player.setUiContext(uiExecutionContext.getUIContext());
 		player.next();
 		Song song = player.getCurrentSong();
 		return Results.success("Now playing: "+song.info());

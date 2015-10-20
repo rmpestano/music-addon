@@ -48,6 +48,7 @@ public class PlayCommand extends AbstractUICommand {
 			if(player.getPlayQueue() == null || player.getPlayQueue().isEmpty()){
 				return Results.fail("No songs to play, use music-add-songs command");
 			}
+			player.setUiContext(uiExecutionContext.getUIContext());
 			player.play();
 			Song song = player.getCurrentSong();
 			return Results.success("Now playing: "+song.info());
