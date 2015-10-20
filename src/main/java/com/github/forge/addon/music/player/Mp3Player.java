@@ -107,10 +107,10 @@ public class Mp3Player implements Player {
                 @Override
                 public void playbackFinished(PlaybackEvent evt) {
                     try {
-                        if(isGenerateStatistics()){
+                        if (isGenerateStatistics()) {
                             statisticsManager.addStatistic(currentSong);
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     next();

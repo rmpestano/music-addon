@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -48,29 +49,31 @@ public class RemovePlaylistCommandTest extends BaseTest{
 
     @Test
     public void shouldNotRemovePlaylist() throws Exception {
-        playlistManager.createPlaylist(TEST_PLAY_LIST_NAME);
-        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + TEST_PLAY_LIST_NAME + "\nn", 10, TimeUnit.SECONDS);
+        String playlist = UUID.randomUUID().toString();
+        playlistManager.createPlaylist(playlist);
+        assertThat(playlistManager.hasPlaylist(playlist),is(true));
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\nN", 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
 
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(true));
+        assertThat(playlistManager.hasPlaylist(playlist), is(true));
 
     }
 
     @Test
     public void shouldRemovePlaylist() throws Exception {
-        playlistManager.createPlaylist(TEST_PLAY_LIST_NAME);
-        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + TEST_PLAY_LIST_NAME + "\n Y", 10, TimeUnit.SECONDS);
+        String playlist = UUID.randomUUID().toString();
+        playlistManager.createPlaylist(playlist);
+        assertThat(playlistManager.hasPlaylist(playlist),is(true));
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist + "\n Y", 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
 
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist(TEST_PLAY_LIST_NAME), is(false));
+        assertThat(playlistManager.hasPlaylist(playlist), is(false));
 
     }
 

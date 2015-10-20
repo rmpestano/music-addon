@@ -54,7 +54,7 @@ public class AddSongCommandTest extends BaseTest {
 	}
 
 	@Test
-	public void shouldAddNewPlaylist() throws Exception {
+	public void shouldAddSongsToPlaylist() throws Exception {
 		manager.createPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
 		Result result = shellTest.execute("music-add-songs --targetPlaylist " + PlaylistManager.DEFAULT_PLAYLIST
 				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 5, TimeUnit.SECONDS);

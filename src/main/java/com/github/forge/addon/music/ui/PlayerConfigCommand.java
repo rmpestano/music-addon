@@ -1,8 +1,6 @@
 package com.github.forge.addon.music.ui;
 
 import com.github.forge.addon.music.event.ChangePlaylistEvent;
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.player.Player;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
@@ -47,7 +45,7 @@ public class PlayerConfigCommand extends AbstractUICommand {
 
     @Inject
     @WithAttributes(label = "Select playlist", description = "Current playlist", required = true, type = InputType.DROPDOWN)
-    private UISelectOne<String> targetPlaylist;
+    private UISelectOne<String> playlist;
 
     @Inject
     @WithAttributes(label = "Shuffle", description = "Plays songs in random order" )
@@ -73,13 +71,13 @@ public class PlayerConfigCommand extends AbstractUICommand {
     public void initializeUI(UIBuilder uiBuilder) throws Exception {
         List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
         Collections.sort(playlistNames);
-        targetPlaylist.setValueChoices(playlistNames);
-        targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+        playlist.setValueChoices(playlistNames);
+        playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
 
-        targetPlaylist.addValueChangeListener(new ValueChangeListener() {
+        playlist.addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                if(valueChangeEvent.getNewValue() != null && !valueChangeEvent.getNewValue().toString().equals(playlistManager.getCurrentPlaylist().getName())){
+                if (valueChangeEvent.getNewValue() != null && !valueChangeEvent.getNewValue().toString().equals(playlistManager.getCurrentPlaylist().getName())) {
                     playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
                     playlstChanged = true;//if playlist has changed fire event
                 }
@@ -88,33 +86,12 @@ public class PlayerConfigCommand extends AbstractUICommand {
 
         shuffle.setDefaultValue(player.isShuffle());
 
-        shuffle.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                player.setShuffle((Boolean) valueChangeEvent.getNewValue());
-            }
-        });
-
         repeat.setDefaultValue(player.isRepeat());
-        repeat.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                player.setRepeat((Boolean) valueChangeEvent.getNewValue());
-            }
-        });
-
 
         songStatistics.setDefaultValue(player.isGenerateStatistics());
 
-        songStatistics.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                player.setGenerateStatistics((Boolean) valueChangeEvent.getNewValue());
-            }
-        });
 
-
-        uiBuilder.add(targetPlaylist).add(shuffle).add(repeat).add(songStatistics);
+        uiBuilder.add(playlist).add(shuffle).add(repeat).add(songStatistics);
     }
 
     @Override
@@ -124,6 +101,10 @@ public class PlayerConfigCommand extends AbstractUICommand {
         if(playlstChanged && player.isPlaying()){
             playlistEvent.fire(new ChangePlaylistEvent(playlistManager.getCurrentPlaylist()));
         }
+
+        player.setRepeat(repeat.getValue());
+        player.setShuffle(shuffle.getValue());
+        player.setGenerateStatistics(songStatistics.getValue());
 
         return Results.success("Updated player configuration successfully!");
 

@@ -7,6 +7,8 @@
 
 package com.github.forge.addon.music;
 
+import com.github.forge.addon.music.player.Player;
+import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.shell.test.ShellTest;
@@ -32,13 +34,16 @@ import static org.junit.Assert.assertThat;
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class NewPlaylistCommandTest extends BaseTest{
+public class ConfigPlayerCommandTest extends BaseTest{
 
     @Inject
     private UITestHarness uiTestHarness;
 
     @Inject
     private ShellTest shellTest;
+
+    @Inject
+    Player player;
 
 
     @Deployment
@@ -47,19 +52,37 @@ public class NewPlaylistCommandTest extends BaseTest{
         return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
-
     @Test
-    public void shouldAddNewPlaylist() throws Exception {
+    public void shouldChangePlaylist() throws Exception {
         String playlist = UUID.randomUUID().toString();
-        Result result = shellTest.execute("music-new-playlist --name " + playlist, 25, TimeUnit.SECONDS);
+        playlistManager.createPlaylist(playlist);
+        assertThat(playlistManager.hasPlaylist(playlist),is(true));
+        assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST),is(true));
+        assertThat(playlistManager.getCurrentPlaylist(),is(playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST)));
+
+        Result result = shellTest.execute("music-player-config --playlist " + playlist, 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
 
-        assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist(playlist), is(true));
+        assertThat(playlistManager.getCurrentPlaylist(),is(playlistManager.getPlaylist(playlist)));
 
     }
+
+    @Test
+    public void shouldSetShuffleAndRepeat() throws Exception {
+        assertThat(player.isShuffle(),is(false));
+        assertThat(player.isRepeat(),is(false));
+        Result result = shellTest.execute("music-player-config --playlist " + PlaylistManager.DEFAULT_PLAYLIST
+                +" --repeat y --shuffle y" , 10, TimeUnit.SECONDS);
+        if(result instanceof Failed){
+            Logger.getLogger(getClass().getName()).severe(result.getMessage());
+        }
+
+        assertThat(player.isShuffle(),is(true));
+        assertThat(player.isRepeat(),is(true));
+    }
+
 
 
 }

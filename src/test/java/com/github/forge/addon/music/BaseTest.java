@@ -13,8 +13,6 @@ import java.nio.file.Paths;
  */
 public abstract class BaseTest {
 
-    protected static final String TEST_PLAY_LIST_NAME = "test-playlist";
-
     @Inject
     protected PlaylistManager playlistManager;
 
