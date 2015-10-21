@@ -52,8 +52,11 @@ public class RemovePlaylistCommand extends AbstractUICommand {
         boolean remove = context.getPrompt().promptBoolean("Remove playlist " + name.getValue() + "?");
         if(remove){
             playlistManager.removePlaylist(name.getValue());
+            return Results.success(name.getValue() + " removed with success!");
+        } else{
+            return Results.success("Playlist was not removed.");
         }
-        return Results.success(name.getValue() + " removed with success!");
+
     }
 
 

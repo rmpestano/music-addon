@@ -54,13 +54,9 @@ public class RemovePlaylistCommandTest extends BaseTest{
         String playlist = UUID.randomUUID().toString();
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
-        Result result = shellTest.execute("music-remove-playlist --name " + playlist + newLine() +"n", 10, TimeUnit.SECONDS);
-        if(result instanceof Failed){
-            Logger.getLogger(getClass().getName()).severe(result.getMessage());
-        }
-
+        Result result = shellTest.execute("music-remove-playlist --name " + playlist +newLine()+"n", 10, TimeUnit.SECONDS);
+        assertThat(result.getMessage(),is(equalTo("Playlist was not removed.")));
         assertThat(result, not(instanceOf(Failed.class)));
-        assertThat(playlistManager.hasPlaylist(playlist), is(true));
 
     }
 
@@ -70,10 +66,7 @@ public class RemovePlaylistCommandTest extends BaseTest{
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
         Result result = shellTest.execute("music-remove-playlist --name " + playlist + newLine()+"Y", 15, TimeUnit.SECONDS);
-        if(result instanceof Failed){
-            Logger.getLogger(getClass().getName()).severe(result.getMessage());
-        }
-
+        assertThat(result.getMessage(),is(equalTo(playlist+" removed with success!")));
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist(playlist), is(false));
 
