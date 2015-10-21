@@ -94,7 +94,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 		Playlist currentPlaylist = playlistManager.getPlaylist(playlistName);
 		List<Song> playlistSongs = currentPlaylist == null ? Collections.<Song> emptyList()
 				: currentPlaylist.getSongs();
-		List<String> songsUIValue = new LinkedList<>();
+		List<String> songsUIValue = new ArrayList<>();
 		for (Song playlistSong : playlistSongs) {
 			String uiValue = (!"".equals(playlistSong.getArtist()) ? playlistSong.getArtist():"no artist") + " - " + (!"".equals(playlistSong.getAlbum()) ? playlistSong.getAlbum():"no album found") + " - "
 					+ ((!"".equals(playlistSong.getTitle())) ? playlistSong.getTitle():"no title found for file "+playlistSong.getLocation());
