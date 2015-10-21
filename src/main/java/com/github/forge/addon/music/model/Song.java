@@ -5,6 +5,7 @@ import com.mpatric.mp3agic.Mp3File;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import javax.enterprise.inject.Vetoed;
+import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,17 @@ public class Song implements Serializable{
 
     public Song(String location) {
         this.location = location;
+    }
+
+    //looks faster then read the mp3 file in getters
+    public Song(JsonObject json){
+        this.location = json.getString("location");
+        this.album = json.getString("album");
+        this.artist = json.getString("artist");
+        this.genre = json.getString("genre");
+        this.year = json.getString("year");
+        this.title = json.getString("title");
+        this.duration = json.getString("duration");
     }
 
     public String getTitle() {

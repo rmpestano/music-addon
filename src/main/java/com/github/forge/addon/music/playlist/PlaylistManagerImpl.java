@@ -54,33 +54,44 @@ public class PlaylistManagerImpl implements PlaylistManager {
 		List<JsonObject> playListsJson = getAllPlaylists();
 		for (JsonObject jsonObject : playListsJson) {
 			Playlist playlist = parsePlaylist(jsonObject);
-			playlists.put(playlist.getName(), playlist);
+      if (playlist != null) {
+        playlists.put(playlist.getName(), playlist);
+      }
 		}
 	}
 
   @Override
-  public void initPlaylist(String name){
-       playlists.remove(name);
-       playlists.put(name,parsePlaylist(loadPlaylist(name)));
+  public void initPlaylist(String name) {
+      playlists.remove(name);
+      Playlist playlist = parsePlaylist(loadPlaylist(name));
+      if (playlist != null) {
+        playlists.put(name, playlist);
+      } else {
+        Logger.getLogger(getClass().getName()).warning("Playlist " + name + " not initialized due to parse errors");
+      }
   }
 
   public Playlist parsePlaylist(JsonObject jsonObject){
         if(jsonObject == null){
             return null;
         }
-        Playlist playlist = new Playlist(jsonObject.getString("name"));
-        JsonArray jsonSongs = jsonObject.getJsonArray("songs");
-        List<Song> songs = new ArrayList<>();
-        for (JsonValue jsonSong : jsonSongs) {
+        try {
+          Playlist playlist = new Playlist(jsonObject.getString("name"));
+          JsonArray jsonSongs = jsonObject.getJsonArray("songs");
+          List<Song> songs = new ArrayList<>();
+          for (JsonValue jsonSong : jsonSongs) {
             JsonObject songObject = (JsonObject) jsonSong;
-            Song song = new Song(songObject.getString("location"));
+            Song song = new Song(songObject);
             songs.add(song);
-        }
-        playlist.addSongs(songs);
+          }
+          playlist.addSongs(songs);
 
-      return playlist;
-
-   }
+          return playlist;
+         }catch (Exception e){
+          Logger.getLogger(getClass().getName()).warning("Problems for parsing playlist" + " - " +e.getMessage() + " - "+e.getCause());
+      }
+    return null;
+}
 
 
     @Override
@@ -115,7 +126,13 @@ public class PlaylistManagerImpl implements PlaylistManager {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Song song : playlist.getSongs()) {
             arrayBuilder.add(Json.createObjectBuilder().
-                            add("location", song.getLocation())
+                            add("location", song.getLocation()).
+                            add("title",song.getTitle()).
+                            add("album",song.getAlbum()).
+                            add("artist",song.getArtist()).
+                            add("genre",song.getGenre()).
+                            add("year",song.getYear()).
+                            add("duration",song.getDuration())
             );
         }
         JsonArray songs = arrayBuilder.build();

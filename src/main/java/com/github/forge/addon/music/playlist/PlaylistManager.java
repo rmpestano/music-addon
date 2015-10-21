@@ -82,4 +82,5 @@ public interface PlaylistManager extends Serializable{
     void removePlaylists();
 
     void removePlaylist(String name);
+
 }

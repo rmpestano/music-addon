@@ -69,7 +69,6 @@ public class RemovePlaylistCommandTest extends BaseTest{
         assertThat(result.getMessage(),is(equalTo(playlist+" removed with success!")));
         assertThat(result, not(instanceOf(Failed.class)));
         assertThat(playlistManager.hasPlaylist(playlist), is(false));
-
     }
 
 

@@ -3,8 +3,8 @@ package com.github.forge.addon.music.ui;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -12,7 +12,6 @@ import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.context.UIValidationContext;
 import org.jboss.forge.addon.ui.hints.InputType;
 import org.jboss.forge.addon.ui.input.UIInputMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
@@ -24,7 +23,6 @@ import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
-import org.jboss.forge.addon.ui.validate.UIValidator;
 
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
@@ -55,7 +53,8 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 
 	@Override
 	public void initializeUI(final UIBuilder builder) throws Exception {
-		List<String> playlistNames = new ArrayList<>(playlistManager.getPlaylists().keySet());
+		final Map<String, Playlist> playlists = playlistManager.getPlaylists();
+		List<String> playlistNames = new ArrayList<>(playlists.keySet());
 		Collections.sort(playlistNames);
 		playlist.setValueChoices(playlistNames);
 		Playlist currentPlaylist = playlistManager.getCurrentPlaylist();
@@ -74,7 +73,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 				List<String> formatedPlaylistSongs = getFormatedPlaylistSongs(selectedPlaylist);
 				songs.setValue(formatedPlaylistSongs);
 				songs.setNote(formatedPlaylistSongs.size() + " songs found.");
-				playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(selectedPlaylist));
+				playlistManager.setCurrentPlaylist(playlists.get(selectedPlaylist));
 			}
 		});
 
