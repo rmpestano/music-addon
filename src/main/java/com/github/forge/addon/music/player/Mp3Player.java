@@ -1,5 +1,26 @@
 package com.github.forge.addon.music.player;
 
+import com.github.forge.addon.music.event.AddSongEvent;
+import com.github.forge.addon.music.event.ChangePlaylistEvent;
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.github.forge.addon.music.statistics.StatisticsManager;
+import com.github.forge.addon.music.util.StopWatch;
+import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.Equalizer;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.AudioDevice;
+import javazoom.jl.player.FactoryRegistry;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
+import org.apache.commons.lang.time.DurationFormatUtils;
+import org.jboss.forge.addon.ui.context.UIContext;
+
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,29 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.github.forge.addon.music.util.StopWatch;
-import javazoom.jl.decoder.Decoder;
-import javazoom.jl.decoder.Equalizer;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.AudioDevice;
-import javazoom.jl.player.FactoryRegistry;
-import javazoom.jl.player.advanced.AdvancedPlayer;
-import javazoom.jl.player.advanced.PlaybackEvent;
-import javazoom.jl.player.advanced.PlaybackListener;
-
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import com.github.forge.addon.music.event.AddSongEvent;
-import com.github.forge.addon.music.event.ChangePlaylistEvent;
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.playlist.PlaylistManager;
-import com.github.forge.addon.music.statistics.StatisticsManager;
-import org.apache.commons.lang.time.DurationFormatUtils;
-import org.jboss.forge.addon.ui.context.UIContext;
 
 /**
  * Created by pestano on 15/10/15.
@@ -89,8 +87,8 @@ public class Mp3Player implements Player {
                 stopWatch.start();
                 createAudioDevice();
                 runPlayerThread();
-            }catch (Exception e){
-                Logger.getLogger(getClass().getName()).warning("Could not play song at location: "+currentSong.getLocation() + " \nmessage:"+e.getMessage() +"\ncause:"+e.getMessage()) ;
+            } catch (Exception e) {
+                Logger.getLogger(getClass().getName()).warning("Could not play song at location: " + currentSong.getLocation() + " \nmessage:" + e.getMessage() + "\ncause:" + e.getMessage());
                 next();
             }
         }
@@ -125,11 +123,9 @@ public class Mp3Player implements Player {
                         e.printStackTrace();
                     }
                     next();
-                    if(uiContext != null && currentSong != null){
-                        String msg = "Now playing: "+currentSong.info();
-                        if(uiContext.getProvider().isGUI()){
-                            uiContext.getProvider().getOutput().info(uiContext.getProvider().getOutput().out(),msg);
-                        }else{
+                    if (uiContext != null && currentSong != null) {
+                        String msg = "Now playing: " + currentSong.info();
+                        if (!uiContext.getProvider().isGUI()) {
                             uiContext.getProvider().getOutput().out().println(msg);
                         }
 
@@ -221,7 +217,7 @@ public class Mp3Player implements Player {
                 //FIXME log ex
                 e.printStackTrace();
             } finally {
-                if(generateStatistics){
+                if (generateStatistics) {
                     statisticsManager.persistStatistics();
                 }
             }
@@ -293,7 +289,7 @@ public class Mp3Player implements Player {
 
     @Override
     public List<Song> getPlayQueue() {
-        if(playQueue == null){
+        if (playQueue == null) {
             initPlayQueue();
         }
         return playQueue;
@@ -328,11 +324,10 @@ public class Mp3Player implements Player {
     }
 
     @Override
-    public String getPlayingTime(){
-        if(isPlaying()){
+    public String getPlayingTime() {
+        if (isPlaying()) {
             return DurationFormatUtils.formatDuration(stopWatch.getMilliseconds(), "m:ss");
-        }
-        else{
+        } else {
             return "";
         }
     }
