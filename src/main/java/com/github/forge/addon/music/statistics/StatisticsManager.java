@@ -73,7 +73,7 @@ public class StatisticsManager {
             }
         }
 
-        persistStatistics();
+        persistStatistics(shouldPersistStatistics());
     }
 
 
@@ -84,9 +84,9 @@ public class StatisticsManager {
     /**
      * persists play statistics into forge_home folder
      */
-    public void persistStatistics() {
+    public void persistStatistics(boolean shouldPersist) {
         //persist after 10 plays
-        if (shouldPersistStatistics()) {
+        if (shouldPersist) {
             FileResource<?> statisticsFile = getStatisticsFile();
             JsonArray persistedJsonArray = Json.createReader(statisticsFile.getResourceInputStream()).readObject().getJsonArray("statistics");
             JsonArrayBuilder newStatisticsArray = Json.createArrayBuilder();

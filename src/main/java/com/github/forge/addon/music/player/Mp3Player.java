@@ -219,7 +219,7 @@ public class Mp3Player implements Player {
             try {
                 songStream.close();
                 if (generateStatistics) {
-                    statisticsManager.persistStatistics();
+                    statisticsManager.persistStatistics(true);
                 }
             } catch (Exception e) {
                 //FIXME log ex
