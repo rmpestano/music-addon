@@ -6,9 +6,18 @@ package com.github.forge.addon.music.util;
 public class StopWatch {
 
   private long begin;
+  private long pauseTime;
 
   public void start(){
     begin = System.currentTimeMillis();
+  }
+
+  public void pause(){
+    pauseTime = System.currentTimeMillis() - begin;
+  }
+
+  public void resume(){
+    begin = System.currentTimeMillis() - pauseTime;
   }
 
   public long getMilliseconds() {

@@ -84,7 +84,11 @@ public class Mp3Player implements Player {
                 return;
             }
             try {
-                stopWatch.start();
+                if (pauseLocation > 0){
+                    stopWatch.resume();
+                } else{
+                    stopWatch.start();
+                }
                 createAudioDevice();
                 runPlayerThread();
             } catch (Exception e) {
@@ -103,6 +107,7 @@ public class Mp3Player implements Player {
 
             if (pauseLocation > 0) {
                 songStream.skip(songTotalLength - pauseLocation);
+                pauseLocation = 0;
             }
             Decoder decoder = new Decoder();
             decoder.setEqualizer(new Equalizer(EqualizerPresets.ROCK.getValue()));
@@ -189,6 +194,7 @@ public class Mp3Player implements Player {
         if (jplayer != null) {
             try {
                 pauseLocation = songStream.available();
+                stopWatch.pause();
                 jplayer.close();
                 songStream.close();
                 executor.shutdownNow();
@@ -212,14 +218,14 @@ public class Mp3Player implements Player {
             songTotalLength = 0;
             try {
                 songStream.close();
-                executor.shutdownNow();
-            } catch (IOException e) {
-                //FIXME log ex
-                e.printStackTrace();
-            } finally {
                 if (generateStatistics) {
                     statisticsManager.persistStatistics();
                 }
+            } catch (Exception e) {
+                //FIXME log ex
+                e.printStackTrace();
+            } finally {
+                executor.shutdownNow();
             }
         }
     }
