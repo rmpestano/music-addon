@@ -87,7 +87,7 @@ image::status.png["Status", scaledwidth="80%"]
 ----
 Music: Search --artist --title --album
 ----
-Search and play songs from any playlist
+Search and play songs from any playlist based on filters
 
 * Next
 +
