@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
  */
 @RunWith(Arquillian.class)
-public class ConfigPlayerCommandTest extends BaseTest{
+public class ConfigCommandTest extends BaseTest{
 
     @Inject
     private UITestHarness uiTestHarness;
@@ -60,7 +60,7 @@ public class ConfigPlayerCommandTest extends BaseTest{
         assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST),is(true));
         assertThat(playlistManager.getCurrentPlaylist(),is(playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST)));
 
-        Result result = shellTest.execute("music-player-config --playlist " + playlist, 10, TimeUnit.SECONDS);
+        Result result = shellTest.execute("music-config --playlist " + playlist, 10, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
@@ -73,7 +73,7 @@ public class ConfigPlayerCommandTest extends BaseTest{
     public void shouldSetShuffleAndRepeat() throws Exception {
         assertThat(player.isShuffle(),is(false));
         assertThat(player.isRepeat(),is(false));
-        Result result = shellTest.execute("music-player-config --playlist " + PlaylistManager.DEFAULT_PLAYLIST
+        Result result = shellTest.execute("music-config --playlist " + PlaylistManager.DEFAULT_PLAYLIST
                 +" --repeat Y --shuffle Y" , 15, TimeUnit.SECONDS);
         if(result instanceof Failed){
             Logger.getLogger(getClass().getName()).severe(result.getMessage());

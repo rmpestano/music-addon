@@ -82,6 +82,13 @@ Shows information of current playing song and next song
 +
 image::status.png["Status", scaledwidth="80%"]
 
+* Search
++
+----
+Music: Search --artist --title --album
+----
+Search and play songs from any playlist
+
 * Next
 +
 ----
