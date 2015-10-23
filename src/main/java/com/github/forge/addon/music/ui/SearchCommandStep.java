@@ -18,6 +18,7 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,19 +47,18 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 
   @Override
   public void initializeUI(UIBuilder builder) throws Exception {
-    songsFound.setValueChoices((Iterable<Song>) builder.getUIContext().getAttributeMap().get("songs"));
-  }
-
-  @Override
-  public boolean isEnabled(UIContext context) {
-    return super.isEnabled(context);
+    List<Song> songs = (List<Song>) builder.getUIContext().getAttributeMap().get("songs");
+    Collections.sort(songs);
+    songsFound.setValueChoices(songs);
+    songsFound.setDefaultValue(songs);
+    songsFound.setNote(songs.size() + " song found.");
+    builder.add(songsFound);
   }
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
     if (songsFound.getValue() != null) {
-      List<Song> newPlayQueue;
-      newPlayQueue = new ArrayList<>();
+      List<Song> newPlayQueue = new ArrayList<>();
       for (Song song : songsFound.getValue()) {
         if (!newPlayQueue.contains(song)) {
           newPlayQueue.add(song);
