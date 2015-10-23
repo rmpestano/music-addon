@@ -128,12 +128,7 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-		if(!uiExecutionContext.getUIContext().getProvider().isGUI()){
 			return playFilteredSongs();
-		} else{
-			//in gui mode go to next step
-			return Results.success();
-		}
 
 	}
 
@@ -219,11 +214,7 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Override
 	public NavigationResult next(UINavigationContext context) throws Exception {
-		if(context.getUIContext().getProvider().isGUI()){
-			context.getUIContext().getAttributeMap().put("songs",filteredSongs);
-			return context.navigateTo(SearchCommandStep.class);
-		}else{
-			return null;
-		}
+		context.getUIContext().getAttributeMap().put("songs",filteredSongs);
+		return context.navigateTo(SearchCommandStep.class);
 	}
 }
