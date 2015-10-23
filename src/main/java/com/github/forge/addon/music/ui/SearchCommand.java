@@ -115,6 +115,15 @@ public class SearchCommand extends AbstractUICommand {
 
 			}
 		});
+
+		genre.addValueChangeListener(new ValueChangeListener() {
+
+			@Override
+			public void valueChanged(ValueChangeEvent arg0) {
+				genreFilter = arg0.getNewValue().toString();
+				filterSongs();
+			}
+		});
 		uiBuilder.add(artist).add(album).add(title).add(genre).add(songsFound);
 	}
 
