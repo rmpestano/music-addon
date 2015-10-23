@@ -14,8 +14,8 @@ Use install addon from git command:
 ----
 addon-install-from-git --url https://github.com/rmpestano/music-addon.git
 ----
-IMPORTANT:
-You need Forge 2.20.0 or superior
+
+IMPORTANT: You need Forge 2.20.0 or superior
 
 === Features
 
