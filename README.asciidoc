@@ -89,6 +89,13 @@ Music: Search --artist --title --album
 ----
 Search and play songs from any playlist based on filters
 
+* Play queue
++
+----
+Music: Play queue
+----
+Shows current play queue
+
 * Next
 +
 ----
