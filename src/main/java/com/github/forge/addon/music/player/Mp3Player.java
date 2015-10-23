@@ -288,9 +288,6 @@ public class Mp3Player implements Player {
         } else {
             playQueue = new ArrayList<>(getAllSongs());
         }
-        if (playQueue.isEmpty()) {
-            throw new RuntimeException("No songs to play");
-        }
     }
 
     @Override

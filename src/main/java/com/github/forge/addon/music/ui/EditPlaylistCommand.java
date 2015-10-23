@@ -41,8 +41,8 @@ public class EditPlaylistCommand extends AbstractUICommand {
 
 
 	@Inject
-	@WithAttributes(label = "Target playlist", description = "Playlist to edit", required = true, type = InputType.DROPDOWN)
-	private UISelectOne<String> targetPlaylist;
+	@WithAttributes(label = "Playlist", description = "Playlist to edit", required = true, type = InputType.DROPDOWN)
+	private UISelectOne<String> playlist;
 
 
 	@Inject
@@ -61,12 +61,12 @@ public class EditPlaylistCommand extends AbstractUICommand {
 	public void initializeUI(UIBuilder builder) throws Exception {
 		List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
 		Collections.sort(playlistNames);
-		targetPlaylist.setValueChoices(playlistNames);
-		targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+		playlist.setValueChoices(playlistNames);
+		playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
 
-		builder.add(targetPlaylist).add(songs);
+		builder.add(playlist).add(songs);
 
-		targetPlaylist.addValueChangeListener(new ValueChangeListener() {
+		playlist.addValueChangeListener(new ValueChangeListener() {
 			@Override
 			public void valueChanged(ValueChangeEvent valueChangeEvent) {
 				String selectedPlaylist = valueChangeEvent.getNewValue().toString();
@@ -105,10 +105,10 @@ public class EditPlaylistCommand extends AbstractUICommand {
 					}
 				}
 			}
-			Playlist playlist = playlistManager.getPlaylist(targetPlaylist.getValue());
-			playlist.getSongs().clear();
-			playlist.addSongs(playlistSongs);
-			playlistManager.savePlaylist(playlist);
+			Playlist playlistToSave = playlistManager.getPlaylist(playlist.getValue());
+			playlistToSave.getSongs().clear();
+			playlistToSave.addSongs(playlistSongs);
+			playlistManager.savePlaylist(playlistToSave);
 
 		}
 

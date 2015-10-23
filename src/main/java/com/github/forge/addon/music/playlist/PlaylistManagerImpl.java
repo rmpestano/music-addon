@@ -170,11 +170,16 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
 
     @Override
-    @Produces
-    @Current
     public Playlist getCurrentPlaylist() {
         if (currentPlaylist == null) {
             currentPlaylist = getPlaylists().get(DEFAULT_PLAYLIST);
+            if(currentPlaylist == null){
+                if(!playlists.isEmpty()){
+                    currentPlaylist = playlists.values().iterator().next();
+                } else{
+                    initPlayLists();
+                }
+            }
         }
         return currentPlaylist;
     }

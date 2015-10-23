@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -13,7 +12,7 @@ import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.hints.InputType;
-import org.jboss.forge.addon.ui.input.UIInputMany;
+import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.input.UISelectOne;
 import org.jboss.forge.addon.ui.input.ValueChangeListener;
 import org.jboss.forge.addon.ui.input.events.ValueChangeEvent;
@@ -41,8 +40,8 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 	private UISelectOne<String> playlist;
 
 	@Inject
-	@WithAttributes(label = "Playlist songs (artist - album - title)", type = InputType.TEXTBOX, enabled = false)
-	private UIInputMany<String> songs;
+	@WithAttributes(label = "Playlist songs", description = "artist - title (album)")
+	private UISelectMany<Song> songs;
 
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
@@ -53,14 +52,14 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 
 	@Override
 	public void initializeUI(final UIBuilder builder) throws Exception {
-		final Map<String, Playlist> playlists = playlistManager.getPlaylists();
-		List<String> playlistNames = new ArrayList<>(playlists.keySet());
+		List<String> playlistNames = new ArrayList<>(playlistManager.getPlaylists().keySet());
 		Collections.sort(playlistNames);
 		playlist.setValueChoices(playlistNames);
 		Playlist currentPlaylist = playlistManager.getCurrentPlaylist();
 		if (currentPlaylist != null) {
 			playlist.setDefaultValue(currentPlaylist.getName());
-			List<String> playlistSongs = getFormatedPlaylistSongs(currentPlaylist.getName());
+			List<Song> playlistSongs = currentPlaylist.getSongs();
+			Collections.sort(playlistSongs);
 			songs.setDefaultValue(playlistSongs);
 			songs.setNote(playlistSongs.size() + " songs found.");
 		}
@@ -70,47 +69,25 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 			@Override
 			public void valueChanged(ValueChangeEvent valueChangeEvent) {
 				String selectedPlaylist = valueChangeEvent.getNewValue().toString();
-				List<String> formatedPlaylistSongs = getFormatedPlaylistSongs(selectedPlaylist);
-				songs.setValue(formatedPlaylistSongs);
-				songs.setNote(formatedPlaylistSongs.size() + " songs found.");
-				playlistManager.setCurrentPlaylist(playlists.get(selectedPlaylist));
-			}
-		});
-
-		songs.addValueChangeListener(new ValueChangeListener() {
-			@Override
-			public void valueChanged(ValueChangeEvent valueChangeEvent) {
-				List<String> oldValue = (List<String>) valueChangeEvent.getOldValue();
-				Collections.sort(oldValue);
-				songs.setValue(oldValue);
-				songs.setDefaultValue(oldValue);
+				List<Song> playlistSongs = playlistManager.getPlaylist(selectedPlaylist).getSongs();
+				Collections.sort(playlistSongs);
+				songs.setValueChoices(playlistSongs);
+				songs.setNote(playlistSongs.size() + " song found.");
+				playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(selectedPlaylist));
 			}
 		});
 
 	}
 
-	private List<String> getFormatedPlaylistSongs(String playlistName) {
-		Playlist currentPlaylist = playlistManager.getPlaylist(playlistName);
-		List<Song> playlistSongs = currentPlaylist == null ? Collections.<Song> emptyList()
-				: currentPlaylist.getSongs();
-		List<String> songsUIValue = new ArrayList<>();
-		for (Song playlistSong : playlistSongs) {
-			String uiValue = (!"".equals(playlistSong.getArtist()) ? playlistSong.getArtist():"no artist") + " - " + (!"".equals(playlistSong.getAlbum()) ? playlistSong.getAlbum():"no album found") + " - "
-					+ ((!"".equals(playlistSong.getTitle())) ? playlistSong.getTitle():"no title found for file "+playlistSong.getLocation());
-			songsUIValue.add(uiValue);
-		}
-		Collections.sort(songsUIValue);
-		return songsUIValue;
-	}
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
 	   if(!uiExecutionContext.getUIContext().getProvider().isGUI()){
-			 List<String> formatedPlaylistSongs = getFormatedPlaylistSongs(playlist.getValue());
+			 List<Song> playlistSongs = playlistManager.getPlaylist(playlist.getValue()).getSongs();
 			 PrintStream out = uiExecutionContext.getUIContext().getProvider().getOutput().out();
-			 out.println(formatedPlaylistSongs.size() + " songs found on playlist: "+playlist.getValue());
+			 out.println(playlistSongs.size() + " songs found on playlist: "+playlist.getValue());
 			 int i = 1;
-			 for (String song : formatedPlaylistSongs) {
+			 for (Song song : playlistSongs) {
 				 out.println(i+"- "+song);
 				  i++;
 			 }

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * Created by pestano on 21/08/15.
  */
 @Vetoed
-public class Song implements Serializable{
+public class Song implements Serializable, Comparable<Song>{
 
     private String location;
     private String title;
@@ -222,7 +222,9 @@ public class Song implements Serializable{
 
     @Override
     public String toString() {
-        return location;
+        StringBuilder sb = new StringBuilder();
+        sb.append(getArtist()).append(" - ").append(getTitle()).append(" ("+getAlbum()+" ");
+        return sb.toString();
     }
 
     @Override
@@ -243,5 +245,22 @@ public class Song implements Serializable{
 
     public String info() {
         return getArtist() +" - " + getTitle() +" ("+getDuration()+"). Album "+getAlbum();
+    }
+    
+    @Override
+    public int compareTo(Song other)
+    {
+        if (other == null)
+            throw new IllegalArgumentException("Cannot compare against null.");
+
+        int result = getArtist().compareTo(other.getArtist());
+
+        if (result == 0)
+            result = getTitle().compareTo(other.getTitle());
+
+        if (result == 0)
+            result = getAlbum().compareTo(other.getAlbum());
+
+        return result;
     }
 }
