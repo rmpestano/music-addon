@@ -12,6 +12,7 @@ import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
+import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.hints.InputType;
 import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
@@ -20,6 +21,7 @@ import org.jboss.forge.addon.ui.input.ValueChangeListener;
 import org.jboss.forge.addon.ui.input.events.ValueChangeEvent;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
+import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.util.Categories;
@@ -29,11 +31,12 @@ import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.player.Player;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import org.jboss.forge.addon.ui.wizard.UIWizard;
 
 /**
  * Created by pestano on 16/08/15.
  */
-public class SearchCommand extends AbstractUICommand {
+public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Inject
 	Player player;
@@ -57,9 +60,6 @@ public class SearchCommand extends AbstractUICommand {
 	@WithAttributes(label = "Genre", description = "Filter by song genre", type = InputType.DEFAULT)
 	private UIInput<String> genre;
 
-	@Inject
-	@WithAttributes(label = "Songs found", description = "artist - title (album)", note = "Selected songs will be played after command execution")
-	private UISelectMany<Song> songsFound;
 
 	private List<Song> allSongs;
 
@@ -85,7 +85,6 @@ public class SearchCommand extends AbstractUICommand {
 		for (Playlist playlist : playlistManager.getPlaylists().values()) {
 			allSongs.addAll(playlist.getSongs());
 		}
-		songsFound.setDefaultValue(Collections.<Song> emptyList());
 
 		title.addValueChangeListener(new ValueChangeListener() {
 
@@ -124,15 +123,24 @@ public class SearchCommand extends AbstractUICommand {
 				filterSongs();
 			}
 		});
-		uiBuilder.add(artist).add(album).add(title).add(genre).add(songsFound);
+		uiBuilder.add(artist).add(album).add(title).add(genre);
 	}
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-		if (songsFound.getValue() != null) {
-			List<Song> newPlayQueue;
-			newPlayQueue = new ArrayList<>();
-			for (Song song : songsFound.getValue()) {
+		if(!uiExecutionContext.getUIContext().getProvider().isGUI()){
+			return playFilteredSongs();
+		} else{
+			//in gui mode go to next step
+			return Results.success();
+		}
+
+	}
+
+	private Result playFilteredSongs() {
+		if (filteredSongs != null && !filteredSongs.isEmpty()) {
+			List<Song> newPlayQueue = new ArrayList<>();
+			for (Song song : filteredSongs) {
 				if (!newPlayQueue.contains(song)) {
 					newPlayQueue.add(song);
 				}
@@ -150,7 +158,8 @@ public class SearchCommand extends AbstractUICommand {
 						+ player.getCurrentSong().info());
 			}
 		}
-		return Results.success("No songs selected or found.");
+
+		return Results.success("No songs found.");
 
 	}
 
@@ -205,6 +214,16 @@ public class SearchCommand extends AbstractUICommand {
 			// if all criteria are satisfied
 			filteredSongs.add(song);
 		}
-		songsFound.setValue(filteredSongs);
+	}
+
+
+	@Override
+	public NavigationResult next(UINavigationContext context) throws Exception {
+		if(context.getUIContext().getProvider().isGUI()){
+			context.getUIContext().getAttributeMap().put("songs",filteredSongs);
+			return context.navigateTo(SearchCommandStep.class);
+		}else{
+			return null;
+		}
 	}
 }
