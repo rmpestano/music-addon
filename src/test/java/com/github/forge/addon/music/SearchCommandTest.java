@@ -65,10 +65,7 @@ public class SearchCommandTest extends BaseTest {
 				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 5, TimeUnit.SECONDS);
 	}
 
-	@After
-	public void after() throws TimeoutException {
-		shellTest.execute("music-remove-playlist --name " + PlaylistManager.DEFAULT_PLAYLIST + newLine()+"Y", 10, TimeUnit.SECONDS);
-	}
+
 
 	@Test
 	public void shouldSearchByArtist() throws Exception {
@@ -92,7 +89,7 @@ public class SearchCommandTest extends BaseTest {
 		{
 			controller.initialize();
 			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("title", "dudge");
+			controller.setValueFor("title", "judge");
 			assertTrue(controller.canMoveToNextStep());
 			Result result = controller.next().execute();
 			assertThat(result, not(instanceOf(Failed.class)));
@@ -129,7 +126,7 @@ public class SearchCommandTest extends BaseTest {
 			assertFalse(controller.canMoveToNextStep());
 			controller.setValueFor("title", "axe");//even if one criteria match
 			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("artist", "ensi"); //now both critera match
+			controller.setValueFor("artist", "ensi"); //now both criteria match
 			assertTrue(controller.canMoveToNextStep());
 			Result result = controller.next().execute();
 			assertThat(result, not(instanceOf(Failed.class)));
