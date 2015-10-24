@@ -243,9 +243,7 @@ public class Song implements Serializable, Comparable<Song>{
         return title != null ? title.hashCode():31;
     }
 
-    public String info() {
-        return getArtist() +" - " + getTitle() +" ("+getDuration()+"). Album "+getAlbum();
-    }
+
     
     @Override
     public int compareTo(Song other)

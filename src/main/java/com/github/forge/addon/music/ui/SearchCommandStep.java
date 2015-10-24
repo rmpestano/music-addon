@@ -82,7 +82,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 			player.play();
 		}
 		return Results.success(
-				"Found " + newPlayQueue.size() + " songs to play. Now playing " + player.getCurrentSong().info());
+				"Found " + newPlayQueue.size() + " songs to play. Now playing " + player.getCurrentSong());
 
 	}
 
