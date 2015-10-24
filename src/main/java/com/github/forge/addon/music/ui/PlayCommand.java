@@ -51,7 +51,7 @@ public class PlayCommand extends AbstractUICommand {
 			player.setUiContext(uiExecutionContext.getUIContext());
 			player.play();
 			Song song = player.getCurrentSong();
-			return Results.success("Now playing: "+song.info());
+			return Results.success("Now playing: "+song);
 
 		}
 	}

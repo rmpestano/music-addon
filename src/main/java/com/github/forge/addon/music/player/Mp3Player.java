@@ -134,7 +134,7 @@ public class Mp3Player implements Player {
                     }
                     next();
                     if (uiContext != null && currentSong != null) {
-                        String msg = "Now playing: " + currentSong.info();
+                        String msg = "Now playing: " + currentSong;
                         if (!uiContext.getProvider().isGUI()) {
                             uiContext.getProvider().getOutput().out().println(msg);
                         }

@@ -45,7 +45,7 @@ public class PauseCommand extends AbstractUICommand {
 		}
 		Song song = player.getCurrentSong();
 		player.pause();
-		return Results.success("Paused: "+song.info());
+		return Results.success("Paused: "+song);
 	}
 
 

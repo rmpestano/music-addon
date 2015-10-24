@@ -40,7 +40,7 @@ public class ShuffleCommand extends AbstractUICommand {
 			throws Exception {
 
 		player.shuffle();
-	    return Results.success("Play queue shuffled successfully. Next song is "+player.getPlayQueue().get(0).info());
+	    return Results.success("Play queue shuffled successfully. Next song is "+player.getPlayQueue().get(0));
 	}
 
 
