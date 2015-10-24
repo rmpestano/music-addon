@@ -7,8 +7,6 @@
 
 package com.github.forge.addon.music;
 
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.player.Player;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import com.github.forge.addon.music.ui.SearchCommand;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -21,7 +19,6 @@ import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,11 +28,9 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.github.forge.addon.music.util.Utils.newLine;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="antonio.goncalves@gmail.com">Antonio Goncalves</a>
@@ -64,7 +59,6 @@ public class SearchCommandTest extends BaseTest {
 		shellTest.execute("music-add-songs --targetPlaylist " + PlaylistManager.DEFAULT_PLAYLIST
 				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 5, TimeUnit.SECONDS);
 	}
-
 
 
 	@Test

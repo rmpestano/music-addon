@@ -93,6 +93,7 @@ public class Mp3Player implements Player {
                 runPlayerThread();
             } catch (Exception e) {
                 Logger.getLogger(getClass().getName()).warning("Could not play song at location: " + currentSong.getLocation() + " \nmessage:" + e.getMessage() + "\ncause:" + e.getMessage());
+                playQueue.remove(currentSong);
                 next();
             }
         }
