@@ -79,6 +79,9 @@ public class Mp3Player implements Player {
 
     @Override
     public void play() {
+        if(!AudioControl.isAudioEnabled()){
+            return;
+        }
         if (!isPlaying()) {
             if (currentSong == null) {
                 next();
