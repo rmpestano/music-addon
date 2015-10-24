@@ -56,9 +56,9 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 
     @Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-		if (songsFilter.hasSongs()) {
+		if (songsFound.hasValue()) {
 			List<Song> newPlayQueue = new ArrayList<>();
-			for (Song song : songsFilter.getSongs()) {
+			for (Song song : songsFound.getValue()) {
 				if (!newPlayQueue.contains(song)) {
 					newPlayQueue.add(song);
 				}
