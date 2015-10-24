@@ -29,6 +29,7 @@ import org.jboss.forge.addon.ui.util.Metadata;
 
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.model.SongsFilter;
 import com.github.forge.addon.music.player.Player;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import org.jboss.forge.addon.ui.wizard.UIWizard;
@@ -55,23 +56,15 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 	@Inject
 	@WithAttributes(label = "Album", description = "Filter by song album", type = InputType.DEFAULT)
 	private UIInput<String> album;
-	
+
 	@Inject
 	@WithAttributes(label = "Genre", description = "Filter by song genre", type = InputType.DEFAULT)
 	private UIInput<String> genre;
 
-
 	private List<Song> allSongs;
 
-	private List<Song> filteredSongs;
-
-	private String artistFilter;
-
-	private String titleFilter;
-
-	private String albumFilter;
-
-	private String genreFilter;
+	@Inject
+	private SongsFilter songsFilter;
 
 	@Override
 	public UICommandMetadata getMetadata(UIContext context) {
@@ -90,7 +83,6 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 			@Override
 			public void valueChanged(ValueChangeEvent arg0) {
-				titleFilter = arg0.getNewValue().toString();
 				filterSongs();
 			}
 		});
@@ -99,7 +91,6 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 			@Override
 			public void valueChanged(ValueChangeEvent arg0) {
-				artistFilter = arg0.getNewValue().toString();
 				filterSongs();
 
 			}
@@ -109,115 +100,81 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 			@Override
 			public void valueChanged(ValueChangeEvent arg0) {
-				albumFilter = arg0.getNewValue().toString();
 				filterSongs();
 
 			}
 		});
 
-		genre.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChanged(ValueChangeEvent arg0) {
-				genreFilter = arg0.getNewValue().toString();
-				filterSongs();
-			}
-		});
 		uiBuilder.add(artist).add(album).add(title).add(genre);
 	}
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-			return playFilteredSongs();
+		filterSongs();
+
+		return null;
 
 	}
 
-	private Result playFilteredSongs() {
-		if (filteredSongs != null && !filteredSongs.isEmpty()) {
-			List<Song> newPlayQueue = new ArrayList<>();
-			for (Song song : filteredSongs) {
-				if (!newPlayQueue.contains(song)) {
-					newPlayQueue.add(song);
-				}
-			}
 
-			if (!newPlayQueue.isEmpty()) {
-				player.getPlayQueue().clear();
-				player.getPlayQueue().addAll(newPlayQueue);
-				if (player.isPlaying()) {
-					player.next();
-				} else {
-					player.play();
-				}
-				return Results.success("Found " + newPlayQueue.size() + " songs to play. Now playing "
-						+ player.getCurrentSong().info());
-			}
-		}
-
-		return Results.success("No songs found.");
-
-	}
-
-	private void filterSongs() {
-		filteredSongs = new ArrayList<>();
+	private synchronized void filterSongs() {
+		songsFilter.getSongs().clear();
 		for (Song song : allSongs) {
 			// filter by title
-			if (hasText(titleFilter)) {
+			if (hasText(title.getValue())) {
 				if (!hasText(song.getTitle())) {
 					continue;// no title, can't match search criteria
 				}
-				if (!song.getTitle().toLowerCase().contains(titleFilter.toLowerCase())) {
+				if (!song.getTitle().toLowerCase().contains(title.getValue().toLowerCase())) {
 					continue; // no match, ignore
 				}
 			}
 			// filter by artist
-			if (hasText(artistFilter)) {
+			if (hasText(artist.getValue())) {
 				if (!hasText(song.getArtist())) {
 					continue;// no artist, cant match search criteria
 				}
 
-				if (!song.getArtist().toLowerCase().contains(artistFilter.toLowerCase())) {
+				if (!song.getArtist().toLowerCase().contains(artist.getValue().toLowerCase())) {
 					continue; // no match, ignore
 				}
 
 			}
 
 			// filter by album
-			if (hasText(albumFilter)) {
+			if (hasText(album.getValue())) {
 				if (!hasText(song.getAlbum())) {
 					continue;// no artist, cant match search criteria
 				}
 
-				if (!song.getAlbum().toLowerCase().contains(albumFilter.toLowerCase())) {
+				if (!song.getAlbum().toLowerCase().contains(album.getValue().toLowerCase())) {
 					continue; // no match, ignore
 				}
 
 			}
 
 			// filter by genre
-			if (hasText(genreFilter)) {
+			if (hasText(genre.getValue())) {
 				if (!hasText(song.getGenre())) {
 					continue;// no artist, cant match search criteria
 				}
 
-				if (!song.getGenre().toLowerCase().contains(genreFilter.toLowerCase())) {
+				if (!song.getGenre().toLowerCase().contains(genre.getValue().toLowerCase())) {
 					continue; // no match, ignore
 				}
 
 			}
 
 			// if all criteria are satisfied
-			filteredSongs.add(song);
+			songsFilter.addSong(song);
 		}
 	}
 
-
 	@Override
 	public NavigationResult next(UINavigationContext context) throws Exception {
-		if(filteredSongs.isEmpty()){
-			return null;
+		if (!songsFilter.hasSongs()) {
+			return null;// go to next step only if there is filtered songs
 		}
-		context.getUIContext().getAttributeMap().put("songs",filteredSongs);
 		return context.navigateTo(SearchCommandStep.class);
 	}
 }

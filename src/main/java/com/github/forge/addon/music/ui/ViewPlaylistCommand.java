@@ -61,6 +61,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 			List<Song> playlistSongs = currentPlaylist.getSongs();
 			Collections.sort(playlistSongs);
 			songs.setDefaultValue(playlistSongs);
+			songs.setValueChoices(playlistSongs);
 			songs.setNote(playlistSongs.size() + " songs found.");
 		}
 		builder.add(playlist).add(songs);
@@ -76,6 +77,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 				playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(selectedPlaylist));
 			}
 		});
+		
 
 	}
 

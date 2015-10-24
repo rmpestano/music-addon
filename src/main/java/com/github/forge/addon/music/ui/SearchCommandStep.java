@@ -1,7 +1,10 @@
 package com.github.forge.addon.music.ui;
 
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.player.Player;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
@@ -16,10 +19,9 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.model.SongsFilter;
+import com.github.forge.addon.music.player.Player;
 
 /**
  * Created by rafael-pestano on 23/10/2015.
@@ -29,6 +31,9 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
   @Inject
   Player player;
 
+  @Inject
+  SongsFilter songsFilter;
+  
   @Inject
   @WithAttributes(label = "Songs found", description = "artist - title (album)", note = "Selected songs will be added to play queue and played after command execution")
   private UISelectMany<Song> songsFound;
@@ -40,43 +45,51 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
         .name("Music: Search").category(Categories.create("Music"));
   }
 
-  @Override
-  public NavigationResult next(UINavigationContext context) throws Exception {
-    return null;//last step
-  }
 
   @Override
   public void initializeUI(UIBuilder builder) throws Exception {
-    List<Song> songs = (List<Song>) builder.getUIContext().getAttributeMap().get("songs");
-    Collections.sort(songs);
-    songsFound.setValueChoices(songs);
-    songsFound.setDefaultValue(songs);
-    songsFound.setNote(songs.size() + " song found.");
+    songsFound.setValueChoices(songsFilter.getSongs());
+    songsFound.setValue(songsFilter.getSongs());
+    songsFound.setNote("Found "+songsFilter.getSongs().size() + " song(s).");
     builder.add(songsFound);
   }
 
-  @Override
-  public Result execute(UIExecutionContext context) throws Exception {
-    if (songsFound.getValue() != null) {
-      List<Song> newPlayQueue = new ArrayList<>();
-      for (Song song : songsFound.getValue()) {
-        if (!newPlayQueue.contains(song)) {
-          newPlayQueue.add(song);
-        }
-      }
+    @Override
+	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
+		if (songsFilter.hasSongs()) {
+			List<Song> newPlayQueue = new ArrayList<>();
+			for (Song song : songsFilter.getSongs()) {
+				if (!newPlayQueue.contains(song)) {
+					newPlayQueue.add(song);
+				}
+			}
 
-      if (!newPlayQueue.isEmpty()) {
-        player.getPlayQueue().clear();
-        player.getPlayQueue().addAll(newPlayQueue);
-        if (player.isPlaying()) {
-          player.next();
-        } else {
-          player.play();
-        }
-        return Results.success("Found " + newPlayQueue.size() + " songs to play. Now playing "
-            + player.getCurrentSong().info());
-      }
-    }
-    return Results.success("No songs selected or found.");
-  }
+			if (!newPlayQueue.isEmpty()) {
+				return playSongs(newPlayQueue);
+			}
+		}
+
+		return Results.success("No songs will be played.");
+
+	}
+
+	private Result playSongs(List<Song> newPlayQueue) {
+		player.getPlayQueue().clear();
+		player.getPlayQueue().addAll(newPlayQueue);
+		if (player.isPlaying()) {
+			player.next();
+		} else {
+			player.play();
+		}
+		return Results.success(
+				"Found " + newPlayQueue.size() + " songs to play. Now playing " + player.getCurrentSong().info());
+
+	}
+
+
+	@Override
+	public NavigationResult next(UINavigationContext context) throws Exception {
+		songsFound.setNote("Found "+songsFilter.getSongs().size() + " song(s).");
+		return null;//last step
+	}
 }
