@@ -58,27 +58,23 @@ public class PlayerTest extends BaseTest {
     @AfterClass
     public static void tearDown() {
         if (AudioControl.isAudioEnabled()) {
-             //AudioControl.setMasterOutputVolume(masterVolume);
+            //AudioControl.setMasterOutputVolume(masterVolume);
             // AudioControl.setMasterOutputMute(masterMute);
         }
     }
 
     @Test
     public void shouldPlaySong() {
-        if (AudioControl.isAudioEnabled()) {
-            saveSong();
-            player.play();
-        }
+        saveSong();
+        player.play();
     }
 
     @Test
     public void shouldPlayAndResume() {
-        if (AudioControl.isAudioEnabled()) {
-            saveSong();
-            player.play();
-            player.pause();
-            player.play();
-        }
+        saveSong();
+        player.play();
+        player.pause();
+        player.play();
     }
 
     private void saveSong() {

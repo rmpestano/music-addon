@@ -6,6 +6,7 @@ import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
 import com.github.forge.addon.music.statistics.StatisticsManager;
+import com.github.forge.addon.music.util.AudioControl;
 import com.github.forge.addon.music.util.StopWatch;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Equalizer;
@@ -168,7 +169,11 @@ public class Mp3Player implements Player {
                 @Override
                 public void run() {
                     try {
-                        jplayer.play();
+                        if(AudioControl.isAudioEnabled()){
+                            jplayer.play();
+                        }else{
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Audio device was not found, no song will be played");
+                        }
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Problems while playing song " + currentSong, ex);
                         throw new RuntimeException(ex);
