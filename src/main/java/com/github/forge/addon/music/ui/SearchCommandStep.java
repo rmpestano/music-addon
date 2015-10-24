@@ -69,7 +69,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 			}
 		}
 
-		return Results.success("No songs will be played.");
+		return Results.success("No songs found.");
 
 	}
 
