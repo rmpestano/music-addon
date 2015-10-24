@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 
 import javax.inject.Inject;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by pestano on 17/10/15.
@@ -25,7 +26,7 @@ public abstract class BaseTest {
     }
 
     @Before
-    public void before() {
+    public void before() throws TimeoutException {
         playlistManager.removePlaylists();
     }
 

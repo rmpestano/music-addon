@@ -8,7 +8,8 @@ import org.jboss.forge.addon.ui.cdi.CommandScoped;
 @CommandScoped
 public class SongsFilter {
 	
-	List<Song> songs = new ArrayList<>();
+	private List<Song> songs = new ArrayList<>();
+	private String artist;
 	
 	public SongsFilter(){
 	}
