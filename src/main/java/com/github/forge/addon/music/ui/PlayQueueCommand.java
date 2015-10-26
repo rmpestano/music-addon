@@ -28,7 +28,7 @@ public class PlayQueueCommand extends AbstractUICommand {
 	Player player;
 
 	@Inject
-	@WithAttributes(label = "Songs", description = "Enqueue songs", enabled = false, note = "If you have random configured the order will not be respected")
+	@WithAttributes(label = "Songs", description = "Enqueue songs", note = "If you have random configured the order will not be respected")
 	private UISelectMany<Song> songs;
 
 	@Override
@@ -43,6 +43,7 @@ public class PlayQueueCommand extends AbstractUICommand {
 		List<Song> enqueuedSongs = player.getPlayQueue();
 		Collections.sort(enqueuedSongs);
 		songs.setValueChoices(enqueuedSongs);
+		builder.add(songs);
 	}
 
 	@Override
