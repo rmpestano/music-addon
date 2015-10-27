@@ -48,9 +48,9 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 
   @Override
   public void initializeUI(UIBuilder builder) throws Exception {
-    songsFound.setValueChoices(songsFilter.getSongs());
-    songsFound.setValue(songsFilter.getSongs());
-    songsFound.setNote("Found "+songsFilter.getSongs().size() + " song(s).");
+    songsFound.setValueChoices(songsFilter.getFilteredSongs());
+    songsFound.setValue(songsFilter.getFilteredSongs());
+    songsFound.setNote("Found "+songsFilter.getFilteredSongs().size() + " song(s).");
     builder.add(songsFound);
   }
 
@@ -89,7 +89,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 
 	@Override
 	public NavigationResult next(UINavigationContext context) throws Exception {
-		songsFound.setNote("Found "+songsFilter.getSongs().size() + " song(s).");
+		songsFound.setNote("Found "+songsFilter.getFilteredSongs().size() + " song(s).");
 		return null;//last step
 	}
 }

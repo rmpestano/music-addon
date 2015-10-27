@@ -33,11 +33,6 @@ import static com.github.forge.addon.music.util.Assert.hasText;
  */
 public class SearchCommand extends AbstractUICommand implements UIWizard {
 
-	@Inject
-	Player player;
-
-	@Inject
-	PlaylistManager playlistManager;
 
 	@Inject
 	@WithAttributes(label = "Title", description = "Filter by song title", type = InputType.DEFAULT)
@@ -55,18 +50,9 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 	@WithAttributes(label = "Genre", description = "Filter by song genre", type = InputType.DEFAULT)
 	private UIInput<String> genre;
 
-	private List<Song> allSongs;
-
 	@Inject
 	private SongsFilter songsFilter;
 
-	private String titleFilter;
-
-	private String artistFilter;
-
-	private String albumFilter;
-
-	private String genreFilter;
 
 
 	@Override
@@ -77,118 +63,19 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-		allSongs = new ArrayList<>();
-		for (Playlist playlist : playlistManager.getPlaylists().values()) {
-			allSongs.addAll(playlist.getSongs());
-		}
-
-		title.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChanged(ValueChangeEvent arg0) {
-				titleFilter = arg0.getNewValue().toString();
-				filterSongs();
-			}
-		});
-
-		artist.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChanged(ValueChangeEvent arg0) {
-				artistFilter = arg0.getNewValue().toString();
-				filterSongs();
-			}
-		});
-
-		album.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChanged(ValueChangeEvent arg0) {
-				albumFilter = arg0.getNewValue().toString();
-				filterSongs();
-
-			}
-		});
-
-		genre.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChanged(ValueChangeEvent arg0) {
-				genreFilter = arg0.getNewValue().toString();
-				filterSongs();
-
-			}
-		});
 
 		uiBuilder.add(artist).add(album).add(title).add(genre);
 	}
 
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
-		filterSongs();
-
 		return null;
 
 	}
 
-	private synchronized void filterSongs() {
-		songsFilter.getSongs().clear();
-		for (Song song : allSongs) {
-			// filter by title
-			if (hasText(titleFilter)) {
-				if (!hasText(song.getTitle())) {
-					continue;// no title, can't match search criteria
-				}
-				if (!song.getTitle().toLowerCase().contains(titleFilter.toLowerCase())) {
-					continue; // no match, ignore
-				}
-			}
-			// filter by artist
-			if (hasText(artistFilter)) {
-				if (!hasText(song.getArtist())) {
-					continue;// no artist, cant match search criteria
-				}
-
-				if (!song.getArtist().toLowerCase().contains(artistFilter.toLowerCase())) {
-					continue; // no match, ignore
-				}
-
-			}
-
-			// filter by album
-			if (hasText(albumFilter)) {
-				if (!hasText(song.getAlbum())) {
-					continue;// no artist, cant match search criteria
-				}
-
-				if (!song.getAlbum().toLowerCase().contains(albumFilter.toLowerCase())) {
-					continue; // no match, ignore
-				}
-
-			}
-
-			// filter by genre
-			if (hasText(genreFilter)) {
-				if (!hasText(song.getGenre())) {
-					continue;// no artist, cant match search criteria
-				}
-
-				if (!song.getGenre().toLowerCase().contains(genreFilter.toLowerCase())) {
-					continue; // no match, ignore
-				}
-
-			}
-
-			// if all criteria are satisfied
-			songsFilter.addSong(song);
-		}
-	}
-
 	@Override
 	public NavigationResult next(UINavigationContext context) throws Exception {
-		if (!songsFilter.hasSongs()) {
-			return null;// go to next step only if there is filtered songs
-		}
+		songsFilter.filter(artist.getValue(),title.getValue(),album.getValue(),genre.getValue());
 		return context.navigateTo(SearchCommandStep.class);
 	}
 }
