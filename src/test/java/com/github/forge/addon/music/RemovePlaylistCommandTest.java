@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
@@ -26,6 +26,7 @@ import org.jboss.forge.addon.ui.test.UITestHarness;
 import org.jboss.forge.arquillian.AddonDependencies;
 import org.jboss.forge.arquillian.archive.AddonArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,6 +43,8 @@ public class RemovePlaylistCommandTest extends BaseTest{
     @Inject
     private ShellTest shellTest;
 
+    private String playlist;
+
 
     @Deployment
     @AddonDependencies
@@ -49,10 +52,14 @@ public class RemovePlaylistCommandTest extends BaseTest{
         return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
+    @Before
+    public void before() throws TimeoutException {
+        playlist = UUID.randomUUID().toString();
+        shellTest.execute("music-new-playlist --name " + playlist, 5, TimeUnit.SECONDS);
+    }
+
     @Test
     public void shouldNotRemovePlaylist() throws Exception {
-        String playlist = UUID.randomUUID().toString();
-        playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
         Result result = shellTest.execute("music-remove-playlist --name " + playlist +newLine()+"n", 10, TimeUnit.SECONDS);
         assertThat(result.getMessage(),is(equalTo("Playlist was not removed.")));
@@ -62,7 +69,6 @@ public class RemovePlaylistCommandTest extends BaseTest{
 
     @Test
     public void shouldRemovePlaylist() throws Exception {
-        String playlist = UUID.randomUUID().toString();
         playlistManager.createPlaylist(playlist);
         assertThat(playlistManager.hasPlaylist(playlist),is(true));
         Result result = shellTest.execute("music-remove-playlist --name " + playlist + newLine()+"Y", 15, TimeUnit.SECONDS);
