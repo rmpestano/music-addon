@@ -42,27 +42,6 @@ public class PlayerTest extends BaseTest {
         return ShrinkWrap.create(AddonArchive.class).addClass(BaseTest.class).addBeansXML();
     }
 
-    @BeforeClass
-    public static void setUp() {
-        if (AudioControl.isAudioEnabled()) {
-            masterVolume = AudioControl.getMasterOutputVolume();
-            masterMute = AudioControl.getMasterOutputMute();
-            AudioControl.setMasterOutputMute(false);
-            AudioControl.setMasterOutputVolume(0.30f);
-        } else {
-            Logger.getLogger(PlayerTest.class.getName()).warning("Audio device is no enabled, tests will be skipped");
-        }
-    }
-
-
-    @AfterClass
-    public static void tearDown() {
-        if (AudioControl.isAudioEnabled()) {
-            //AudioControl.setMasterOutputVolume(masterVolume);
-            // AudioControl.setMasterOutputMute(masterMute);
-        }
-    }
-
     @Test
     public void shouldPlaySong() {
         saveSong();

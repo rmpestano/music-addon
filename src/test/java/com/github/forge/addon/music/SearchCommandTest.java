@@ -13,6 +13,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.forge.addon.shell.test.ShellTest;
 import org.jboss.forge.addon.ui.controller.WizardCommandController;
+import org.jboss.forge.addon.ui.result.CompositeResult;
 import org.jboss.forge.addon.ui.result.Failed;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.test.UITestHarness;
@@ -28,8 +29,10 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
@@ -67,10 +70,10 @@ public class SearchCommandTest extends BaseTest {
 		try (WizardCommandController controller = uiTestHarness.createWizardController(SearchCommand.class))
 		{
 			controller.initialize();
-			assertFalse(controller.canMoveToNextStep());
+			assertTrue(controller.canMoveToNextStep());
 			controller.setValueFor("artist", "ensi");
 			assertTrue(controller.canMoveToNextStep());
-			Result result = controller.next().execute();
+			CompositeResult result = (CompositeResult) controller.next().execute();
 			assertThat(result, not(instanceOf(Failed.class)));
 		}
 
@@ -82,15 +85,16 @@ public class SearchCommandTest extends BaseTest {
 		try (WizardCommandController controller = uiTestHarness.createWizardController(SearchCommand.class))
 		{
 			controller.initialize();
-			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("title", "judge");
 			assertTrue(controller.canMoveToNextStep());
-			Result result = controller.next().execute();
+			controller.setValueFor("title", "judge");
+			CompositeResult result = (CompositeResult) controller.next().execute();
 			assertThat(result, not(instanceOf(Failed.class)));
+			//assertThat(result.getMessage(), is(equalTo("Found 1 song(s) to play. Now playing " )));
+			//assertThat(result.getResults().get(0).getMessage(), is(equalTo("Found 1 song(s) to play. Now playing " )));
+
 		}
 
 	}
-
 
 	@Test
 	public void shouldSearchByGenreAndArtist() throws Exception {
@@ -98,34 +102,24 @@ public class SearchCommandTest extends BaseTest {
 		try (WizardCommandController controller = uiTestHarness.createWizardController(SearchCommand.class))
 		{
 			controller.initialize();
-			assertFalse(controller.canMoveToNextStep());
+			assertTrue(controller.canMoveToNextStep());
 			controller.setValueFor("artist", "ferum");
 			controller.setValueFor("genre", "metal");
-			assertTrue(controller.canMoveToNextStep());
-			Result result = controller.next().execute();
+			CompositeResult result = (CompositeResult) controller.next().execute();
 			assertThat(result, not(instanceOf(Failed.class)));
+			//assertThat(result.getResults().get(0).getMessage(), is(equalTo("Found 1 song(s) to play. Now playing " )));
 		}
 
 	}
-
 
 	@Test
-	public void shouldNotGoToNextStepIfNoSongIfFound() throws Exception {
+	public void shouldSearchByArtistAndTitle() throws Exception {
 
-		try (WizardCommandController controller = uiTestHarness.createWizardController(SearchCommand.class))
-		{
-			controller.initialize();
-			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("artist", "nonexistingsong");
-			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("title", "axe");//even if one criteria match
-			assertFalse(controller.canMoveToNextStep());
-			controller.setValueFor("artist", "ensi"); //now both criteria match
-			assertTrue(controller.canMoveToNextStep());
-			Result result = controller.next().execute();
-			assertThat(result, not(instanceOf(Failed.class)));
-		}
+		Result result = shellTest.execute("music-search --artist ensi --title judge", 5, TimeUnit.SECONDS);
 
+		assertThat(result, not(instanceOf(Failed.class)));
+		//assertThat(result.getMessage(), is(equalTo("Found 1 song(s) to play. Now playing " )));
 	}
+
 
 }

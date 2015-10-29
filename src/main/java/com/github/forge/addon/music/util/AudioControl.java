@@ -1,5 +1,8 @@
 package com.github.forge.addon.music.util;
 
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.FactoryRegistry;
+
 import javax.sound.sampled.*;
 import javax.sound.sampled.Control.Type;
 import java.util.ArrayList;
@@ -10,6 +13,8 @@ import java.util.logging.Logger;
  * Created by pestano on 16/10/15.
  */
 public class AudioControl {
+    private static Boolean isAudioEnabled;
+
     public static void setMasterOutputVolume(float value) {
         if (value < 0 || value > 1)
             throw new IllegalArgumentException(
@@ -30,8 +35,16 @@ public class AudioControl {
         }
     }
 
-    public static boolean isAudioEnabled() {
-        return getMasterOutputLine()!= null && getMasterOutputVolume() != null;
+    public static boolean isAudioEnabled(){
+        try {
+            if(isAudioEnabled == null){
+                FactoryRegistry.systemRegistry().createAudioDevice();
+                isAudioEnabled = true;
+            }
+        }catch (Exception e){
+            isAudioEnabled = false;
+        }
+        return isAudioEnabled;
     }
 
 
@@ -84,11 +97,12 @@ public class AudioControl {
             for (Line line : getAvailableOutputLines(mixer)) {
                 if (line.getLineInfo().toString().toLowerCase().contains("master")) {
                     return line;
-                }else if(backupLine == null && getAvailableOutputLines(mixer) != null){
+                }else if(backupLine == null && line.getControls() != null){
                     backupLine = line;
                 }
             }
         }
+        //no master was found then return backup line
         return backupLine;
     }
 

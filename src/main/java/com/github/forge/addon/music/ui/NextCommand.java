@@ -2,6 +2,7 @@ package com.github.forge.addon.music.ui;
 
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.player.Player;
+import com.github.forge.addon.music.util.AudioControl;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
@@ -38,6 +39,9 @@ public class NextCommand extends AbstractUICommand {
 	@Override
 	public Result execute(UIExecutionContext uiExecutionContext)
 			throws Exception {
+		if(!AudioControl.isAudioEnabled()){
+			return Results.fail("Audio is not enabled.");
+		}
 		player.setUiContext(uiExecutionContext.getUIContext());
 		player.next();
 		Song song = player.getCurrentSong();
