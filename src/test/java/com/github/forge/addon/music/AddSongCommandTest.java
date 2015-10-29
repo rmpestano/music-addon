@@ -42,8 +42,6 @@ import com.github.forge.addon.music.playlist.PlaylistManager;
 @RunWith(Arquillian.class)
 public class AddSongCommandTest extends BaseTest {
 
-	@Inject
-	private PlaylistManager manager;
 
 	@Inject
 	private ShellTest shellTest;
@@ -56,18 +54,12 @@ public class AddSongCommandTest extends BaseTest {
 
 	@Test
 	public void shouldAddSongsToPlaylist() throws Exception {
-		manager.createPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
 		Result result = shellTest.execute("music-add-songs --targetPlaylist " + PlaylistManager.DEFAULT_PLAYLIST
 				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 5, TimeUnit.SECONDS);
 		assertThat(result, not(instanceOf(Failed.class)));
 		assertThat(result.getMessage(),
 				is(equalTo("1 song(s) added to playlist: " + PlaylistManager.DEFAULT_PLAYLIST)));
-		assertThat(playlistManager.hasPlaylist(PlaylistManager.DEFAULT_PLAYLIST), is(true));
-		Playlist playlist = playlistManager.getPlaylist(PlaylistManager.DEFAULT_PLAYLIST);
-		assertNotNull(playlist);
-		Song song = new Song(Paths.get("target/test-classes").toAbsolutePath() + File.separator+"axe.mp3");
-		assertThat(playlist.getSongs(), hasItem(song));
-
 	}
+
 
 }
