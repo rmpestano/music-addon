@@ -52,8 +52,9 @@ public class NewPlaylistCommandTest extends BaseTest{
     public void shouldAddNewPlaylist() throws Exception {
         String playlist = UUID.randomUUID().toString();
         Result result = shellTest.execute("music-new-playlist --name " + playlist, 25, TimeUnit.SECONDS);
+        assertThat(result.getMessage(),is(equalTo("Playlist "+playlist +" created!")));
         if(result instanceof Failed){
-            Logger.getLogger(getClass().getName()).severe(result.getMessage());
+            Logger.getLogger(getClass().getName()).fine(result.getMessage());
         }
 
         assertThat(result, not(instanceOf(Failed.class)));
