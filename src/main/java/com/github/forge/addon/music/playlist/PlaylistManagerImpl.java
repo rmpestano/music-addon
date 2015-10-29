@@ -1,23 +1,20 @@
 package com.github.forge.addon.music.playlist;
 
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.util.Utils;
+import org.jboss.forge.addon.resource.*;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.json.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.json.*;
-
-import org.jboss.forge.addon.resource.*;
-
-import com.github.forge.addon.music.model.Current;
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.util.Utils;
 
 /**
  * Created by pestano on 21/08/15.
@@ -36,62 +33,64 @@ public class PlaylistManagerImpl implements PlaylistManager {
     private Playlist currentPlaylist;
 
 
+    @PostConstruct
+    public void init(){
+        initPlaylists();
+    }
+
     @Override
     public Map<String, Playlist> getPlaylists() {
-        if(playlists == null || playlists.isEmpty()){
-            initPlayLists();
-        }
         return playlists;
     }
 
-	/**
-	 * initialize the Map of playlists based on playlist FORGE_HOME/playlists/
-	 * folder where each json file is a playlist.
-	 */
-	public void initPlayLists() {
-    playlists = new ConcurrentHashMap<>();
-		createPlaylist(DEFAULT_PLAYLIST);
-		List<JsonObject> playListsJson = getAllPlaylists();
-		for (JsonObject jsonObject : playListsJson) {
-			Playlist playlist = parsePlaylist(jsonObject);
-      if (playlist != null) {
-        playlists.put(playlist.getName(), playlist);
-      }
-		}
-	}
+    /**
+     * initialize the Map of playlists based on playlist FORGE_HOME/playlists/
+     * folder where each json file is a playlist.
+     */
+    public void initPlaylists() {
+        playlists = new ConcurrentHashMap<>();
+        createPlaylist(DEFAULT_PLAYLIST);
+        List<JsonObject> playListsJson = getAllPlaylists();
+        for (JsonObject jsonObject : playListsJson) {
+            Playlist playlist = parsePlaylist(jsonObject);
+            if (playlist != null) {
+                playlists.put(playlist.getName(), playlist);
+            }
+        }
+    }
 
-  @Override
-  public void initPlaylist(String name) {
-      playlists.remove(name);
-      Playlist playlist = parsePlaylist(loadPlaylist(name));
-      if (playlist != null) {
-        playlists.put(name, playlist);
-      } else {
-        Logger.getLogger(getClass().getName()).warning("Playlist " + name + " not initialized due to parse errors");
-      }
-  }
+    @Override
+    public void initPlaylist(String name) {
+        playlists.remove(name);
+        Playlist playlist = parsePlaylist(loadPlaylist(name));
+        if (playlist != null) {
+            playlists.put(name, playlist);
+        } else {
+            Logger.getLogger(getClass().getName()).warning("Playlist " + name + " not initialized due to parse errors");
+        }
+    }
 
-  public Playlist parsePlaylist(JsonObject jsonObject){
-        if(jsonObject == null){
+    public Playlist parsePlaylist(JsonObject jsonObject) {
+        if (jsonObject == null) {
             return null;
         }
         try {
-          Playlist playlist = new Playlist(jsonObject.getString("name"));
-          JsonArray jsonSongs = jsonObject.getJsonArray("songs");
-          List<Song> songs = new ArrayList<>();
-          for (JsonValue jsonSong : jsonSongs) {
-            JsonObject songObject = (JsonObject) jsonSong;
-            Song song = new Song(songObject);
-            songs.add(song);
-          }
-          playlist.addSongs(songs);
+            Playlist playlist = new Playlist(jsonObject.getString("name"));
+            JsonArray jsonSongs = jsonObject.getJsonArray("songs");
+            List<Song> songs = new ArrayList<>();
+            for (JsonValue jsonSong : jsonSongs) {
+                JsonObject songObject = (JsonObject) jsonSong;
+                Song song = new Song(songObject);
+                songs.add(song);
+            }
+            playlist.addSongs(songs);
 
-          return playlist;
-         }catch (Exception e){
-          Logger.getLogger(getClass().getName()).warning("Problems for parsing playlist" + " - " +e.getMessage() + " - "+e.getCause());
-      }
-    return null;
-}
+            return playlist;
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).warning("Problems for parsing playlist" + " - " + e.getMessage() + " - " + e.getCause());
+        }
+        return null;
+    }
 
 
     @Override
@@ -127,12 +126,12 @@ public class PlaylistManagerImpl implements PlaylistManager {
         for (Song song : playlist.getSongs()) {
             arrayBuilder.add(Json.createObjectBuilder().
                             add("location", song.getLocation()).
-                            add("title",song.getTitle()).
-                            add("album",song.getAlbum()).
-                            add("artist",song.getArtist()).
-                            add("genre",song.getGenre()).
-                            add("year",song.getYear()).
-                            add("duration",song.getDuration())
+                            add("title", song.getTitle()).
+                            add("album", song.getAlbum()).
+                            add("artist", song.getArtist()).
+                            add("genre", song.getGenre()).
+                            add("year", song.getYear()).
+                            add("duration", song.getDuration())
             );
         }
         JsonArray songs = arrayBuilder.build();
@@ -173,11 +172,11 @@ public class PlaylistManagerImpl implements PlaylistManager {
     public Playlist getCurrentPlaylist() {
         if (currentPlaylist == null) {
             currentPlaylist = getPlaylists().get(DEFAULT_PLAYLIST);
-            if(currentPlaylist == null){
-                if(!playlists.isEmpty()){
+            if (currentPlaylist == null) {
+                if (!playlists.isEmpty()) {
                     currentPlaylist = playlists.values().iterator().next();
-                } else{
-                    initPlayLists();
+                } else {
+                    initPlaylists();
                 }
             }
         }
@@ -218,7 +217,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @Override
     public void removePlaylist(String name) {
         Resource<?> playList = getPlayListHomeDir().getChild(name + ".json");
-      boolean deleted = false;
+        boolean deleted = false;
         if (playList.exists()) {
             deleted = playList.delete();
         }

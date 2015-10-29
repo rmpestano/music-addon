@@ -25,10 +25,6 @@ public abstract class BaseTest {
         System.setProperty("user.home", Paths.get("").toAbsolutePath().toString() + "/target");
     }
 
-    @Before
-    public void before() throws TimeoutException {
-        playlistManager.removePlaylists();
-    }
 
     @AfterClass
     public static void afterClass() {

@@ -90,7 +90,7 @@ public class AddSongsCommand extends AbstractUICommand {
             addSongsFromDir(dir.getValue(), songsToAdd);
         }
 
-        if (songs.getValue() != null) {
+        if (songs.hasValue()) {
             addSongFiles((List<FileResource<?>>) songs.getValue(), songsToAdd);
         }
 
