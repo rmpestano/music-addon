@@ -55,7 +55,7 @@ public class AddSongCommandTest extends BaseTest {
 	@Test
 	public void shouldAddSongsToPlaylist() throws Exception {
 		Result result = shellTest.execute("music-add-songs --targetPlaylist " + PlaylistManager.DEFAULT_PLAYLIST
-				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 5, TimeUnit.SECONDS);
+				+ " --dir " + Paths.get("target/test-classes").toAbsolutePath(), 10, TimeUnit.SECONDS);
 		assertThat(result, not(instanceOf(Failed.class)));
 		assertThat(result.getMessage(),
 				is(equalTo("1 song(s) added to playlist: " + PlaylistManager.DEFAULT_PLAYLIST)));
