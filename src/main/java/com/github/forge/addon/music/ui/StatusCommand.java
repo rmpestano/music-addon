@@ -63,7 +63,7 @@ public class StatusCommand extends AbstractUICommand {
 			return (". Next song: "+ nextSong.getTitle() + " ("+nextSong.getDuration()+")");
 		}
 
-		return "";
+		return ". No more songs in play queue";
 
 	}
 
