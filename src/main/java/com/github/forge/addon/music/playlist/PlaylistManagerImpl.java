@@ -66,7 +66,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
         if (playlist != null) {
             playlists.put(name, playlist);
         } else {
-            Logger.getLogger(getClass().getName()).warning("Playlist " + name + " not initialized due to parse errors");
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,"Playlist " + name + " not initialized due to parse errors");
         }
     }
 
@@ -74,8 +74,10 @@ public class PlaylistManagerImpl implements PlaylistManager {
         if (jsonObject == null) {
             return null;
         }
+        String name = null;
         try {
-            Playlist playlist = new Playlist(jsonObject.getString("name"));
+             name = jsonObject.getString("name");
+            Playlist playlist = new Playlist();
             JsonArray jsonSongs = jsonObject.getJsonArray("songs");
             List<Song> songs = new ArrayList<>();
             for (JsonValue jsonSong : jsonSongs) {
@@ -87,7 +89,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
             return playlist;
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).warning("Problems for parsing playlist" + " - " + e.getMessage() + " - " + e.getCause());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,"Problems for parsing playlist" + name + ". Message - " + e.getMessage(),e);
         }
         return null;
     }
