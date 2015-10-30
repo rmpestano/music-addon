@@ -54,7 +54,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
         for (JsonObject jsonObject : playListsJson) {
             Playlist playlist = parsePlaylist(jsonObject);
             if (playlist != null) {
-                playlists.put(playlist.getName(), playlist);
+                playlists.putIfAbsent(playlist.getName(), playlist);
             }
         }
     }
@@ -76,8 +76,8 @@ public class PlaylistManagerImpl implements PlaylistManager {
         }
         String name = null;
         try {
-             name = jsonObject.getString("name");
-            Playlist playlist = new Playlist();
+            name = jsonObject.getString("name");
+            Playlist playlist = new Playlist(name);
             JsonArray jsonSongs = jsonObject.getJsonArray("songs");
             List<Song> songs = new ArrayList<>();
             for (JsonValue jsonSong : jsonSongs) {

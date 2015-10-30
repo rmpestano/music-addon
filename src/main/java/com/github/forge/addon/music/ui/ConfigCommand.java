@@ -48,8 +48,8 @@ public class ConfigCommand extends AbstractUICommand {
     private UISelectOne<String> playlist;
 
     @Inject
-    @WithAttributes(label = "Shuffle", description = "Plays songs in random order" )
-    private UIInput<Boolean> shuffle;
+    @WithAttributes(label = "Random", description = "Plays songs in random order" )
+    private UIInput<Boolean> random;
 
     @Inject
     @WithAttributes(label = "Repeat", description = "if true the play queue will not remove played songs from the queue")
@@ -84,14 +84,14 @@ public class ConfigCommand extends AbstractUICommand {
             }
         });
 
-        shuffle.setDefaultValue(player.isShuffle());
+        random.setDefaultValue(player.isRandom());
 
         repeat.setDefaultValue(player.isRepeat());
 
         songStatistics.setDefaultValue(player.isGenerateStatistics());
 
 
-        uiBuilder.add(playlist).add(shuffle).add(repeat).add(songStatistics);
+        uiBuilder.add(playlist).add(random).add(repeat).add(songStatistics);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ConfigCommand extends AbstractUICommand {
         }
 
         player.setRepeat(repeat.getValue());
-        player.setShuffle(shuffle.getValue());
+        player.setRandom(random.getValue());
         player.setGenerateStatistics(songStatistics.getValue());
 
         return Results.success("Updated player configuration successfully!");

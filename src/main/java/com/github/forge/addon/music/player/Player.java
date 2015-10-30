@@ -31,7 +31,7 @@ public interface Player {
 
     boolean isRepeat();
 
-    boolean isShuffle();
+    boolean isRandom();
 
     boolean isGenerateStatistics();
 
@@ -61,7 +61,7 @@ public interface Player {
      * if <code>true<code/> will shuffle queue every time Player#next() song is request
      * @param shuffle
      */
-    void setShuffle(boolean shuffle);
+    void setRandom(boolean shuffle);
 
     /**
      * if <code>true<code/> will return Player.getCurrentSong() instead of Player.next() song after playing a song

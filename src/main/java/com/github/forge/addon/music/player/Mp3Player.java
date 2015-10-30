@@ -23,7 +23,6 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +48,7 @@ public class Mp3Player implements Player {
     @Inject
     StopWatch stopWatch;
 
-    private boolean shuffle;
+    private boolean random;
 
     private boolean repeat;
 
@@ -245,7 +244,7 @@ public class Mp3Player implements Player {
             initPlayQueue();
         }
         int index = 0;
-        if (isShuffle()) {
+        if (isRandom()) {
             index = new Random(System.currentTimeMillis()).nextInt(playQueue.size());
         }
         currentSong = playQueue.get(index);
@@ -272,8 +271,8 @@ public class Mp3Player implements Player {
     }
 
     @Override
-    public boolean isShuffle() {
-        return shuffle;
+    public boolean isRandom() {
+        return random;
     }
 
     @Override
@@ -313,8 +312,8 @@ public class Mp3Player implements Player {
     }
 
     @Override
-    public void setShuffle(boolean shuffle) {
-        this.shuffle = shuffle;
+    public void setRandom(boolean random) {
+        this.random = random;
     }
 
     @Override

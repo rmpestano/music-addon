@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -54,12 +55,13 @@ public class PlaylistManagerTest extends BaseTest {
 
     @Test
     public void shouldCreatePlayList() throws Exception {
-        assertThat(playlistManager.hasPlaylist("myplaylist"), is(false));
-        playlistManager.createPlaylist("myplaylist");//should trigger the creation of default playlist
-        assertThat(playlistManager.hasPlaylist("myplaylist"), is(true));
-        Playlist playlist = playlistManager.getPlaylist("myplaylist");
+        String playlst = UUID.randomUUID().toString();
+        assertThat(playlistManager.hasPlaylist(playlst), is(false));
+        playlistManager.createPlaylist(playlst);//should trigger the creation of default playlist
+        assertThat(playlistManager.hasPlaylist(playlst), is(true));
+        Playlist playlist = playlistManager.getPlaylist(playlst);
         assertNotNull(playlist);
-        assertEquals("myplaylist", playlist.getName());
+        assertEquals(playlst, playlist.getName());
     }
 
     @Test
