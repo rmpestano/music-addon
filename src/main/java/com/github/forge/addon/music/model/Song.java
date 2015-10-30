@@ -223,7 +223,7 @@ public class Song implements Serializable, Comparable<Song>{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getArtist()).append(" - ").append(getTitle()).append(" ("+getAlbum()+" ");
+        sb.append(getArtist()).append(" - ").append(getTitle()).append(" ("+getAlbum()+") ");
         return sb.toString();
     }
 
