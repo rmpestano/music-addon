@@ -1,7 +1,9 @@
 package com.github.forge.addon.music.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -36,11 +38,11 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
   SongsFilter songsFilter;
   
   @Inject
-  @WithAttributes(label = "Songs found", description = "artist - title (album)", note = "Selected songs will be added to play queue and played after command execution")
+  @WithAttributes(label = "Songs found", description = "artist - title (duration) - album", note = "Selected songs will be added to play queue and played after command execution")
   private UISelectMany<Song> songsFound;
   
   @Inject
-  @WithAttributes(label = "Reset", description = "Will reset play queue and add found songs to its begining", defaultValue="true")
+  @WithAttributes(label = "Reset queue", description = "Will reset play queue and add found songs to its beggining. If false found songs will be append to the end of play queue", defaultValue="true")
   private UIInput<Boolean> resetQueue;
 
   @Override
@@ -65,7 +67,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
     @Override
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
 		if (songsFound.hasValue()) {
-			List<Song> newPlayQueue = new ArrayList<>();
+			Set<Song> newPlayQueue = new HashSet<>();
 			for (Song song : songsFound.getValue()) {
 				if (!newPlayQueue.contains(song)) {
 					newPlayQueue.add(song);
@@ -89,7 +91,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
      * @param newPlayQueue
      * @return
      */
-	private Result playSongs(List<Song> newPlayQueue) {
+	private Result playSongs(Set<Song> newPlayQueue) {
 		Boolean reset = resetQueue.getValue(); 
 		if(reset){
 			player.getPlayQueue().clear();	

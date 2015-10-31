@@ -4,7 +4,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>com.github.forge.addon</groupId>
    <artifactId>music-addon</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.1-SNAPSHOT</version>
 
    <properties>
       <jacoco.version>0.7.4.201502262128</jacoco.version>
@@ -13,8 +13,8 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <version.forge>2.20.0.Final</version.forge>
       <version.furnace>2.22.5.Final</version.furnace>
-      <version.swagger-doclet>1.1.1</version.swagger-doclet>
    </properties>
+   
    <dependencyManagement>
       <dependencies>
          <dependency>
