@@ -28,7 +28,7 @@ public class PlayQueueCommand extends AbstractUICommand {
 	Player player;
 
 	@Inject
-	@WithAttributes(label = "Songs", description = "Enqueue songs", note = "If you have random configured the order will not be respected")
+	@WithAttributes(label = "Songs", description = "Enqueue songs", note = "Selected songs will be removed from queue after command execution")
 	private UISelectMany<Song> songs;
 
 	@Override
@@ -59,6 +59,12 @@ public class PlayQueueCommand extends AbstractUICommand {
 				i++;
 			}
 		}
+		else if(songs.hasValue()){
+		 for (Song song : songs.getValue()) {
+			 player.getPlayQueue().remove(song);
+	    	}
+		}
+		
 		return Results.success("Command executed successfully!");
 	}
 

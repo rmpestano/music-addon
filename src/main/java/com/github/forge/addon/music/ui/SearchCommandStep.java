@@ -10,6 +10,7 @@ import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
+import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.NavigationResult;
@@ -37,6 +38,10 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
   @Inject
   @WithAttributes(label = "Songs found", description = "artist - title (album)", note = "Selected songs will be added to play queue and played after command execution")
   private UISelectMany<Song> songsFound;
+  
+  @Inject
+  @WithAttributes(label = "Reset", description = "Will reset play queue and add found songs to its begining", defaultValue="true")
+  private UIInput<Boolean> resetQueue;
 
   @Override
   public Metadata getMetadata(UIContext context)
@@ -51,7 +56,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
     songsFound.setValueChoices(songsFilter.getFilteredSongs());
     songsFound.setValue(songsFilter.getFilteredSongs());
     songsFound.setNote("Found "+songsFilter.getFilteredSongs().size() + " song(s).");
-    builder.add(songsFound);
+    builder.add(songsFound).add(resetQueue);
   }
 
     @Override
@@ -74,7 +79,9 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 	}
 
 	private Result playSongs(List<Song> newPlayQueue) {
-		player.getPlayQueue().clear();
+		if(resetQueue.getValue()){
+			player.getPlayQueue().clear();
+		}
 		player.getPlayQueue().addAll(newPlayQueue);
 		if (player.isPlaying()) {
 			player.next();
