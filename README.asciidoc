@@ -94,6 +94,10 @@ image::status.png["Status", scaledwidth="80%"]
 Music: Search --artist --title --album
 ----
 Search, add to play queue and play songs from any playlist based on filters
++
+.Search command demo                       
+image:http://img.youtube.com/vi/o4ulaYczoiQ/0.jpg[Search command demo, link=https://www.youtube.com/watch?v=o4ulaYczoiQ, window="_blank", height="200", width="300"]
+
 
 * Play queue
 +
