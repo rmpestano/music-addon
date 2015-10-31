@@ -1,3 +1,4 @@
+
 package com.github.forge.addon.music.ui;
 
 import javax.inject.Inject;
@@ -55,7 +56,7 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
 
-		uiBuilder.add(artist).add(album).add(title).add(genre);
+		uiBuilder.add(title).add(artist).add(album).add(genre);
 	}
 
 	@Override

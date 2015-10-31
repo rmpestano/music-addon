@@ -216,6 +216,9 @@ public class Mp3Player implements Player {
     @Override
     public void stop() {
         cancelPlayingSong();
+        if(playQueue != null){
+        	playQueue.clear();
+        }
         if (jplayer != null) {
             jplayer.close();
             if (device != null) {
