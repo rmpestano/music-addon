@@ -357,5 +357,10 @@ public class Mp3Player implements Player {
     public void onSongAdded(@Observes AddSongEvent addSongEvent) {
         playQueue = null;
     }
+    
+   @Override
+   public boolean isPaused(){
+    	return pauseLocation > 0;
+    }
 
 }

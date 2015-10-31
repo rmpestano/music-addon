@@ -69,7 +69,9 @@ public class ConfigCommand extends AbstractUICommand {
 
     @Override
     public void initializeUI(UIBuilder uiBuilder) throws Exception {
-        List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
+        List<String> playlistNames = new ArrayList();
+        playlistNames.add("");
+        playlistNames.addAll(playlistManager.getPlaylists().keySet());
         Collections.sort(playlistNames);
         playlist.setValueChoices(playlistNames);
         playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
@@ -78,7 +80,12 @@ public class ConfigCommand extends AbstractUICommand {
             @Override
             public void valueChanged(ValueChangeEvent valueChangeEvent) {
                 if (valueChangeEvent.getNewValue() != null && !valueChangeEvent.getNewValue().toString().equals(playlistManager.getCurrentPlaylist().getName())) {
-                    playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
+                	if(valueChangeEvent.getNewValue().equals("")){
+                		playlistManager.setCurrentPlaylist(null);
+                		
+                	}else{
+                		playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
+                	}
                     playlstChanged = true;//if playlist has changed fire event
                 }
             }

@@ -44,8 +44,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
   private UIInput<Boolean> resetQueue;
 
   @Override
-  public Metadata getMetadata(UIContext context)
-  {
+  public Metadata getMetadata(UIContext context){
     return Metadata.from(super.getMetadata(context), getClass()).description("Select and play songs ")
         .name("Music: Search").category(Categories.create("Music"));
   }
@@ -56,6 +55,10 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
     songsFound.setValueChoices(songsFilter.getFilteredSongs());
     songsFound.setValue(songsFilter.getFilteredSongs());
     songsFound.setNote("Found "+songsFilter.getFilteredSongs().size() + " song(s).");
+    if(System.getProperty("resetqueue") != null){
+    	resetQueue.setValue(Boolean.valueOf(System.getProperty("resetqueue")));
+    }
+    
     builder.add(songsFound).add(resetQueue);
   }
 
@@ -78,18 +81,35 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
 
 	}
 
+    /**
+     * if reset flag is set the play queue must be reseted
+     * and searched songs must be played immediately 
+     * 
+     * 
+     * @param newPlayQueue
+     * @return
+     */
 	private Result playSongs(List<Song> newPlayQueue) {
-		if(resetQueue.getValue()){
-			player.getPlayQueue().clear();
+		Boolean reset = resetQueue.getValue(); 
+		if(reset){
+			player.getPlayQueue().clear();	
 		}
 		player.getPlayQueue().addAll(newPlayQueue);
 		if (player.isPlaying()) {
-			player.next();
+			if(reset){
+				//only go to next if reset is set otherwise just enqueue found songs
+				player.next();
+			}
 		} else {
-			player.play();
+			//if not paused starts playing found songs
+			if(!player.isPaused()){
+				player.play();
+			}
 		}
+		//remember me till forge is restarted
+		System.setProperty("resetqueue", reset.toString());
 		return Results.success(
-				"Found " + newPlayQueue.size() + " song(s) to play. Now playing " + player.getCurrentSong());
+				"Added " + newPlayQueue.size() + " song(s) to play queue. Now playing " + player.getCurrentSong());
 
 	}
 

@@ -80,4 +80,6 @@ public interface Player {
 
     boolean isPlaying();
 
+	boolean isPaused();
+
 }

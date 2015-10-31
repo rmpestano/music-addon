@@ -1,20 +1,30 @@
 package com.github.forge.addon.music.playlist;
 
-import com.github.forge.addon.music.model.Playlist;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.util.Utils;
-import org.jboss.forge.addon.resource.*;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.json.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+
+import org.jboss.forge.addon.resource.DirectoryResource;
+import org.jboss.forge.addon.resource.FileResource;
+import org.jboss.forge.addon.resource.Resource;
+import org.jboss.forge.addon.resource.ResourceFactory;
+import org.jboss.forge.addon.resource.ResourceFilter;
+
+import com.github.forge.addon.music.model.Playlist;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.util.Utils;
 
 /**
  * Created by pestano on 21/08/15.
@@ -36,6 +46,7 @@ public class PlaylistManagerImpl implements PlaylistManager {
     @PostConstruct
     public void init(){
         initPlaylists();
+        this.setCurrentPlaylist(playlists.get(DEFAULT_PLAYLIST));
     }
 
     @Override
@@ -172,16 +183,6 @@ public class PlaylistManagerImpl implements PlaylistManager {
 
     @Override
     public Playlist getCurrentPlaylist() {
-        if (currentPlaylist == null) {
-            currentPlaylist = getPlaylists().get(DEFAULT_PLAYLIST);
-            if (currentPlaylist == null) {
-                if (!playlists.isEmpty()) {
-                    currentPlaylist = playlists.values().iterator().next();
-                } else {
-                    initPlaylists();
-                }
-            }
-        }
         return currentPlaylist;
     }
 
