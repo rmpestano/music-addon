@@ -40,7 +40,7 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 	private UISelectOne<String> playlist;
 
 	@Inject
-	@WithAttributes(label = "Playlist songs", description = "artist - title (album)")
+	@WithAttributes(label = "Playlist songs", description = "artist - title (duration) - album")
 	private UISelectMany<Song> songs;
 
 	@Override
