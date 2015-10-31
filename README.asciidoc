@@ -71,6 +71,10 @@ image::player-config.png["player config", scaledwidth="75%"]
 +
 . Now your are ready to play songs inside your favourite IDE:
 +
+----
+Music: play
+----
++
 image::play.png["Now playing...", scaledwidth="70%"]
 
 === Other commands
@@ -89,14 +93,14 @@ image::status.png["Status", scaledwidth="80%"]
 ----
 Music: Search --artist --title --album
 ----
-Search and play songs from any playlist based on filters
+Search, add to play queue and play songs from any playlist based on filters
 
 * Play queue
 +
 ----
 Music: Play queue
 ----
-Shows current play queue
+Shows current play queue. Also let you to remove songs from the queue.
 
 * Next
 +
@@ -111,5 +115,12 @@ Plays next song in play queue
 Music: Shuffle
 ----
 Shuffles playing queue
+
+* Hits
++
+----
+Music: Hits
+----
+Shows and let you play the most played songs based on your statistics.
 
 
