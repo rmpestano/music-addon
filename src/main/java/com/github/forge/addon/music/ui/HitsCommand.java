@@ -1,7 +1,6 @@
 
 package com.github.forge.addon.music.ui;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +13,8 @@ import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.input.UIInput;
 import org.jboss.forge.addon.ui.input.UISelectMany;
+import org.jboss.forge.addon.ui.input.ValueChangeListener;
+import org.jboss.forge.addon.ui.input.events.ValueChangeEvent;
 import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.Result;
@@ -62,17 +63,30 @@ public class HitsCommand extends AbstractUICommand {
 
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-		List<PlayStatistic> playHits = statisticsManager.getHitsFromStatistics(size.getValue());	
-		songHits.setValueChoices(playHits);
-		songHits.setValue(playHits);
-		songHits.setNote("Found " + playHits.size() + " song(s).");
+		updateHits();
 		if (System.getProperty("resetqueue") != null) {
 			resetQueue.setValue(Boolean.valueOf(System.getProperty("resetqueue")));
 		}
 		if (System.getProperty("hitsSize") != null) {
 			size.setValue(Integer.parseInt(System.getProperty("hitsSize")));
 		}
-		uiBuilder.add(songHits).add(resetQueue);
+		
+		size.addValueChangeListener(new ValueChangeListener() {
+			
+			@Override
+			public void valueChanged(ValueChangeEvent event) {
+				updateHits();
+				
+			}
+		});
+		uiBuilder.add(size).add(songHits).add(resetQueue);
+	}
+
+	private void updateHits() {
+		List<PlayStatistic> playHits = statisticsManager.getHitsFromStatistics(size.getValue());	
+		songHits.setValueChoices(playHits);
+		songHits.setValue(playHits);
+		
 	}
 
 	@Override
