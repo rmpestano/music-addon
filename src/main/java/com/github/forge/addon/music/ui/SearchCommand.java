@@ -55,7 +55,6 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-
 		uiBuilder.add(title).add(artist).add(album).add(genre);
 	}
 

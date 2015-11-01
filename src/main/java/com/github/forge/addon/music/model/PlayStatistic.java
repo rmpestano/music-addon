@@ -97,6 +97,13 @@ public class PlayStatistic {
     public void setYear(String year) {
         this.year = year;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(playCount).append(") ").append(getArtist()).append(" - ").append(getTitle()).append(" - ").append(getAlbum());
+        return sb.toString();
+    }
 
     @Override
     public boolean equals(Object o) {

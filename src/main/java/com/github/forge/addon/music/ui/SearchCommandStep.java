@@ -1,6 +1,7 @@
 package com.github.forge.addon.music.ui;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
   SongsFilter songsFilter;
   
   @Inject
-  @WithAttributes(label = "Songs found", description = "artist - title (duration) - album", note = "Selected songs will be added to play queue and played after command execution")
+  @WithAttributes(label = "Songs found", description = "artist - title (duration) - album", note = "Selected songs will be added to play queue.")
   private UISelectMany<Song> songsFound;
   
   @Inject
@@ -91,10 +92,11 @@ public class SearchCommandStep extends AbstractUICommand implements UIWizardStep
      */
 	private Result playSongs(Set<Song> newPlayQueue) {
 		Boolean reset = resetQueue.getValue(); 
+		List<Song> playQueue = player.getPlayQueue();
 		if(reset){
-			player.getPlayQueue().clear();	
+			playQueue.clear();	
 		}
-		player.getPlayQueue().addAll(newPlayQueue);
+		playQueue.addAll(newPlayQueue);
 		if (player.isPlaying()) {
 			if(reset){
 				//only go to next if reset is set otherwise just enqueue found songs

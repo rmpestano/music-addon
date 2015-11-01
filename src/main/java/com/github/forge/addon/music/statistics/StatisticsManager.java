@@ -1,20 +1,27 @@
 package com.github.forge.addon.music.statistics;
 
-import com.github.forge.addon.music.model.PlayStatistic;
-import com.github.forge.addon.music.model.Song;
-import com.github.forge.addon.music.util.Utils;
-import org.jboss.forge.addon.resource.DirectoryResource;
-import org.jboss.forge.addon.resource.FileResource;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.json.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+
+import org.jboss.forge.addon.resource.DirectoryResource;
+import org.jboss.forge.addon.resource.FileResource;
+
+import com.github.forge.addon.music.model.PlayStatistic;
+import com.github.forge.addon.music.model.Song;
+import com.github.forge.addon.music.util.Utils;
 
 /**
  * Created by pestano on 18/10/15.
@@ -24,8 +31,19 @@ public class StatisticsManager {
 
     public static final String STATISTICS_FILE = "plays-statistics.json";
 
+	private static final Comparator<? super PlayStatistic> hitsComparator = new Comparator<PlayStatistic>() {
+
+		@Override
+		public int compare(PlayStatistic o1, PlayStatistic o2) {
+			Long countO1 = o1.getPlayCount().longValue();	
+			Long countO2 = o2.getPlayCount().longValue();
+			return countO2.compareTo(countO1);
+		}
+	};
+
     @Inject
     private Utils utils;
+    
 
     private List<PlayStatistic> playStatistics;
 
@@ -78,6 +96,8 @@ public class StatisticsManager {
 
 
     public List<PlayStatistic> getPlayStatistics() {
+    	 
+    	
         return playStatistics;
     }
 
@@ -88,9 +108,8 @@ public class StatisticsManager {
         //persist after 10 plays
         if (shouldPersist) {
             FileResource<?> statisticsFile = getStatisticsFile();
-            JsonArray persistedJsonArray = Json.createReader(statisticsFile.getResourceInputStream()).readObject().getJsonArray("statistics");
             JsonArrayBuilder newStatisticsArray = Json.createArrayBuilder();
-            List<PlayStatistic> persistedStatistics = readFromStatisticsFile(persistedJsonArray);//already persisted statistics
+            List<PlayStatistic> persistedStatistics = readPersistedStatistics();//already persisted statistics
             for (PlayStatistic playStatistic : playStatistics) {
                 int indexOf = persistedStatistics.indexOf(playStatistic);
                 if (indexOf != -1) {
@@ -116,7 +135,14 @@ public class StatisticsManager {
         }
     }
 
-    /**
+    private List<PlayStatistic> readPersistedStatistics() {
+    	FileResource<?> statisticsFile = getStatisticsFile();
+    	JsonArray persistedJsonArray = Json.createReader(statisticsFile.getResourceInputStream()).readObject().getJsonArray("statistics");
+        List<PlayStatistic> persistedStatistics = readFromStatisticsFile(persistedJsonArray);
+		return persistedStatistics;
+	}
+
+	/**
      * should persist to local json statistics file on every 10 played songs
      */
     private boolean shouldPersistStatistics() {
@@ -151,6 +177,26 @@ public class StatisticsManager {
         return playStatistics;
 
     }
+    
+    /**
+     * 
+     * @param size number of top most played songs to return
+     * @return 
+     */
+    public List<PlayStatistic> getHitsFromStatistics(int size) {
+		List<PlayStatistic> mostPlayedSongs = new ArrayList<>();
+		List<PlayStatistic> persistedStatistics = readPersistedStatistics();
+		persistedStatistics.sort(hitsComparator);
+		
+		if(persistedStatistics.size() >= size){
+			mostPlayedSongs = persistedStatistics.subList(0, size);
+		} else{
+			mostPlayedSongs = persistedStatistics;
+		}
+		
+		return mostPlayedSongs;
+		
+	}
 
 
     /**

@@ -30,6 +30,23 @@ public class SongsFilter {
 
 		filteredSongs = new ArrayList<>();
 	}
+	
+	public Song findSong(String artist, String title, String album) {
+		for (Song song : allSongs) {
+			if(song.getArtist().toLowerCase().equals(artist.toLowerCase())){
+				if(song.getAlbum().toLowerCase().equals(album.toLowerCase())){
+					if(song.getTitle().toLowerCase().equals(title.toLowerCase())){
+						return song;
+					}
+					
+				}
+				
+			}
+			
+		}	
+		return null;
+		
+	}
 
 
 	public void filter(String artist, String title, String album, String genre){
