@@ -126,5 +126,5 @@ Shuffles playing queue
 Music: Hits
 ----
 Shows and let you play the most played songs based on your statistics.
-
+image::hits.png["hits command"]
 
