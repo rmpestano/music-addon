@@ -189,7 +189,7 @@ public class StatisticsManager {
 		persistedStatistics.sort(hitsComparator);
 		
 		if(persistedStatistics.size() <= size){
-			mostPlayedSongs = persistedStatistics.subList(0, size);
+			mostPlayedSongs = persistedStatistics.subList(0, size-1);
 		} else{
 			mostPlayedSongs = persistedStatistics;
 		}
