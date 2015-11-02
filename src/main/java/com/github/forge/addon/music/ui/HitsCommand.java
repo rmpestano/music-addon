@@ -63,7 +63,6 @@ public class HitsCommand extends AbstractUICommand {
 
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-		updateHits();
 		if (System.getProperty("resetqueue") != null) {
 			resetQueue.setValue(Boolean.valueOf(System.getProperty("resetqueue")));
 		}
@@ -75,18 +74,21 @@ public class HitsCommand extends AbstractUICommand {
 			
 			@Override
 			public void valueChanged(ValueChangeEvent event) {
-				updateHits();
-				
+				Integer newValue = (Integer) event.getNewValue();
+				updateHits(newValue);
 			}
 		});
 		uiBuilder.add(size).add(songHits).add(resetQueue);
+		updateHits(size.getValue());
 	}
 
-	private void updateHits() {
-		List<PlayStatistic> playHits = statisticsManager.getHitsFromStatistics(size.getValue());	
-		songHits.setValueChoices(playHits);
-		songHits.setValue(playHits);
-		
+	private void updateHits(int size) {
+		if(size > 0){
+			List<PlayStatistic> playHits = statisticsManager.getHitsFromStatistics(size);
+			songHits.setValueChoices(playHits);
+			songHits.setValue(playHits);
+		}
+
 	}
 
 	@Override

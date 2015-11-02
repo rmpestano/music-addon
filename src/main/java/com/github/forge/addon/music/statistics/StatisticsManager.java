@@ -188,7 +188,7 @@ public class StatisticsManager {
 		List<PlayStatistic> persistedStatistics = readPersistedStatistics();
 
 		if(persistedStatistics.size() >= size){
-			mostPlayedSongs = persistedStatistics.subList(0, size-1);
+			mostPlayedSongs = persistedStatistics.subList(0, size);
 		} else{
 			mostPlayedSongs = persistedStatistics;
 		}
