@@ -186,13 +186,14 @@ public class StatisticsManager {
     public List<PlayStatistic> getHitsFromStatistics(int size) {
 		List<PlayStatistic> mostPlayedSongs = new ArrayList<>();
 		List<PlayStatistic> persistedStatistics = readPersistedStatistics();
-		persistedStatistics.sort(hitsComparator);
-		
+
 		if(persistedStatistics.size() >= size){
 			mostPlayedSongs = persistedStatistics.subList(0, size-1);
 		} else{
 			mostPlayedSongs = persistedStatistics;
 		}
+        mostPlayedSongs.sort(hitsComparator);
+
 		
 		return mostPlayedSongs;
 		
