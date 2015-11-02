@@ -141,7 +141,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadGenre() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getGenreDescription();
@@ -153,7 +154,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadTitle() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getTitle();
@@ -165,7 +167,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadYear() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getYear();
@@ -179,7 +182,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadArtist() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getArtist();
@@ -191,7 +195,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadAlbum() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         if (mp3.hasId3v1Tag()) {
             return mp3.getId3v1Tag().getAlbum();
@@ -203,7 +208,8 @@ public class Song implements Serializable, Comparable<Song>{
     private String loadDuration() {
         Mp3File mp3 = getMp3File();
         if(mp3 == null){
-            return "Song not found at location "+location;
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Song not found at location "+location);
+            return null;
         }
         return DurationFormatUtils.formatDuration(mp3.getLengthInMilliseconds(),"m:ss");
     }
