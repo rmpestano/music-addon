@@ -4,6 +4,7 @@ import com.github.forge.addon.music.event.AddSongEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
+import com.github.forge.addon.music.util.AppCache;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.resource.Resource;
@@ -97,7 +98,7 @@ public class AddSongsCommand extends AbstractUICommand {
         Playlist plList = playlistManager.getPlaylist(targetPlaylist.getValue().toString());
         plList.addSongs(songsToAdd);
         playlistManager.savePlaylist(plList);
-        addSongEvent.fire(new AddSongEvent());
+        addSongEvent.fire(new AddSongEvent(songsToAdd));
         int numSongsAdded = songsToAdd.size();
         songsToAdd.clear();
         songs.setValue(null);

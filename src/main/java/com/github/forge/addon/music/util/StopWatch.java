@@ -2,6 +2,7 @@ package com.github.forge.addon.music.util;
 
 /**
  * Created by rafael-pestano on 20/10/2015.
+ * controls play time of current playing song.
  */
 public class StopWatch {
 
