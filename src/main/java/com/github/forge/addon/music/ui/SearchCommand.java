@@ -20,6 +20,10 @@ import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizard;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pestano on 16/08/15.
@@ -59,7 +63,9 @@ public class SearchCommand extends AbstractUICommand implements UIWizard {
 
 	@Override
 	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-		genre.setValueChoices(appCache.getGenres());
+		List<String> genres = new ArrayList<>(appCache.getGenres());
+		Collections.sort(genres);
+		genre.setValueChoices(genres);
 		uiBuilder.add(title).add(artist).add(album).add(genre);
 	}
 
