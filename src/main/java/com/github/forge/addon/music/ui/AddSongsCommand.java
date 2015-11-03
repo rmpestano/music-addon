@@ -67,7 +67,9 @@ public class AddSongsCommand extends AbstractUICommand {
         List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
         Collections.sort(playlistNames);
         targetPlaylist.setValueChoices(playlistNames);
-        targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+        if(playlistManager.getCurrentPlaylist() != null){
+            targetPlaylist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+        }
         if (lastSelectedDir != null) {
             dir.setDefaultValue(lastSelectedDir);
         }

@@ -42,7 +42,7 @@ public class HitsCommand extends AbstractUICommand {
 	private UIInput<Integer> size;
 
 	@Inject
-	@WithAttributes(label = "Reset queue", description = "Will reset play queue and add found songs to its beggining. If false found songs will be append to the end of play queue", defaultValue = "true")
+	@WithAttributes(label = "Reset queue", description = "If checked will reset play queue and add found songs to its beginning. If not checked found songs will be append to the end of play queue", defaultValue = "true")
 	private UIInput<Boolean> resetQueue;
 	
 	@Inject

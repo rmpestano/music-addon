@@ -62,7 +62,9 @@ public class EditPlaylistCommand extends AbstractUICommand {
 		List<String> playlistNames = new ArrayList(playlistManager.getPlaylists().keySet());
 		Collections.sort(playlistNames);
 		playlist.setValueChoices(playlistNames);
-		playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+		if(playlistManager.getCurrentPlaylist() != null){
+			playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+		}
 
 		builder.add(playlist).add(songs);
 

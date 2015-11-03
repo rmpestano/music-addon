@@ -51,7 +51,7 @@ public class StatusCommand extends AbstractUICommand {
 			return Results.success("player is stopped");
 		} else{
 			Song song = player.getCurrentSong();
-			return Results.success(song + ". Played time: "+player.getPlayingTime() + ". Playlist: "+playlistManager.getCurrentPlaylist().getName() + getNextSongInfo());
+			return Results.success(song + ". Played time: "+player.getPlayingTime() + ". "+playlistManager.getCurrentPlaylist() != null ? ("Playlist: "+playlistManager.getCurrentPlaylist().getName()):"" + getNextSongInfo());
 		}
 
 	}
