@@ -22,50 +22,55 @@ import java.util.List;
 public class StatusCommand extends AbstractUICommand {
 
 
-	@Inject
-	Player player;
+    @Inject
+    Player player;
 
-	@Inject
-	PlaylistManager playlistManager;
-
-
-
-	@Override
-	public UICommandMetadata getMetadata(UIContext context) {
-		return Metadata.forCommand(StatusCommand.class)
-				.name("Music: Status")
-				.description("Show which song is playing, song length, time played and next song")
-				.category(Categories.create("Music"));
-	}
-
-	@Override
-	public void initializeUI(UIBuilder uiBuilder) throws Exception {
-	}
-
-	@Override
-	public Result execute(UIExecutionContext uiExecutionContext)
-			throws Exception {
+    @Inject
+    PlaylistManager playlistManager;
 
 
-		if(!player.isPlaying()){
-			return Results.success("player is stopped");
-		} else{
-			Song song = player.getCurrentSong();
-			return Results.success(song + ". Played time: "+player.getPlayingTime() + ". "+playlistManager.getCurrentPlaylist() != null ? ("Playlist: "+playlistManager.getCurrentPlaylist().getName()):"" + getNextSongInfo());
-		}
+    @Override
+    public UICommandMetadata getMetadata(UIContext context) {
+        return Metadata.forCommand(StatusCommand.class)
+                .name("Music: Status")
+                .description("Show which song is playing, song length, time played and next song")
+                .category(Categories.create("Music"));
+    }
 
-	}
+    @Override
+    public void initializeUI(UIBuilder uiBuilder) throws Exception {
+    }
 
-	private String getNextSongInfo() {
-		List<Song> playQueue = player.getPlayQueue();
-		if(playQueue != null && !playQueue.isEmpty()){
-			Song nextSong = player.getPlayQueue().get(0);
-			return (". Next song: "+ nextSong.getTitle() + " ("+nextSong.getDuration()+")");
-		}
+    @Override
+    public Result execute(UIExecutionContext uiExecutionContext)
+            throws Exception {
 
-		return ". No more songs in play queue";
 
-	}
+        if (!player.isPlaying()) {
+            return Results.success("player is stopped");
+        } else {
+            Song song = player.getCurrentSong();
+            StringBuilder sb = new StringBuilder(song.toString());
+            sb.append(". Played time: ").append(player.getPlayingTime()).append(". ");
+            if (playlistManager.getCurrentPlaylist() != null) {
+                sb.append("Playlist: ").append(playlistManager.getCurrentPlaylist().getName());
+            }
+            sb.append(getNextSongInfo());
+            return Results.success(sb.toString());
+        }
+
+    }
+
+    private String getNextSongInfo() {
+        List<Song> playQueue = player.getPlayQueue();
+        if (playQueue != null && !playQueue.isEmpty()) {
+            Song nextSong = player.getPlayQueue().get(0);
+            return ("Next song: " + nextSong.getTitle() + " (" + nextSong.getDuration() + ")");
+        }
+
+        return ". No more songs in play queue";
+
+    }
 
 
 }

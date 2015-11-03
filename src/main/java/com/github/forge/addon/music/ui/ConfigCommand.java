@@ -48,7 +48,7 @@ public class ConfigCommand extends AbstractUICommand {
     private UISelectOne<String> playlist;
 
     @Inject
-    @WithAttributes(label = "Random", description = "Plays songs in random order" )
+    @WithAttributes(label = "Random", description = "Plays songs in random order")
     private UIInput<Boolean> random;
 
     @Inject
@@ -74,21 +74,14 @@ public class ConfigCommand extends AbstractUICommand {
         playlistNames.addAll(playlistManager.getPlaylists().keySet());
         Collections.sort(playlistNames);
         playlist.setValueChoices(playlistNames);
-        if(playlistManager.getCurrentPlaylist() != null){
+        if (playlistManager.getCurrentPlaylist() != null) {
             playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
         }
 
         playlist.addValueChangeListener(new ValueChangeListener() {
             @Override
             public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                if (playlistManager.getCurrentPlaylist() == null || (valueChangeEvent.getNewValue() != null && !valueChangeEvent.getNewValue().toString().equals(playlistManager.getCurrentPlaylist().getName()))) {
-                	if(valueChangeEvent.getNewValue().equals("")){
-                		playlistManager.setCurrentPlaylist(null);
-                	}else{
-                		playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(valueChangeEvent.getNewValue().toString()));
-                	}
-                    playlstChanged = true;//if playlist has changed fire event
-                }
+                playlstChanged = true;//if playlist has changed fire event
             }
         });
 
@@ -106,7 +99,7 @@ public class ConfigCommand extends AbstractUICommand {
     public Result execute(UIExecutionContext uiExecutionContext)
             throws Exception {
 
-        if(playlstChanged && player.isPlaying()){
+        if (playlstChanged && player.isPlaying()) {
             playlistEvent.fire(new ChangePlaylistEvent(playlistManager.getCurrentPlaylist()));
         }
 
