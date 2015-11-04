@@ -53,7 +53,7 @@ public class StatusCommand extends AbstractUICommand {
             StringBuilder sb = new StringBuilder(song.toString());
             sb.append(". Played time: ").append(player.getPlayingTime()).append(". ");
             if (playlistManager.getCurrentPlaylist() != null) {
-                sb.append("Playlist: ").append(playlistManager.getCurrentPlaylist().getName());
+                sb.append("Playlist: ").append(playlistManager.getCurrentPlaylist().getName()).append(". ");
             }
             sb.append(getNextSongInfo());
             return Results.success(sb.toString());
