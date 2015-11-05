@@ -74,6 +74,8 @@ public class ConfigCommand extends AbstractUICommand {
         playlist.setValueChoices(playlistNames);
         if (playlistManager.getCurrentPlaylist() != null) {
             playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
+        } else{
+            playlist.setDefaultValue("");
         }
 
         random.setDefaultValue(player.isRandom());

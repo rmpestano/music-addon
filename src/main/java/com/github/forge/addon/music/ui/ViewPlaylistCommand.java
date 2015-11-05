@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.github.forge.addon.music.util.AppCache;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIContext;
@@ -36,11 +37,14 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 	PlaylistManager playlistManager;
 
 	@Inject
-	@WithAttributes(label = "Select playlist", description = "Playlist to visualize", required = true, type = InputType.DROPDOWN)
+	AppCache appCache;
+
+	@Inject
+	@WithAttributes(label = "Playlist", description = "Playlist to visualize", type = InputType.DROPDOWN)
 	private UISelectOne<String> playlist;
 
 	@Inject
-	@WithAttributes(label = "Playlist songs", description = "artist - title (duration) - album")
+	@WithAttributes(label = "Songs", description = "artist - title (duration) - album")
 	private UISelectMany<Song> songs;
 
 	@Override
@@ -53,28 +57,36 @@ public class ViewPlaylistCommand extends AbstractUICommand {
 	@Override
 	public void initializeUI(final UIBuilder builder) throws Exception {
 		List<String> playlistNames = new ArrayList<>(playlistManager.getPlaylists().keySet());
+		playlistNames.add("");
 		Collections.sort(playlistNames);
 		playlist.setValueChoices(playlistNames);
 		Playlist currentPlaylist = playlistManager.getCurrentPlaylist();
 		if (currentPlaylist != null) {
 			playlist.setDefaultValue(currentPlaylist.getName());
-			List<Song> playlistSongs = currentPlaylist.getSongs();
-			Collections.sort(playlistSongs);
-			songs.setValue(playlistSongs);
-			songs.setValueChoices(playlistSongs);
-			songs.setNote(playlistSongs.size() + " songs found.");
+		} else{
+			playlist.setDefaultValue("");
 		}
 		builder.add(playlist).add(songs);
 
 		playlist.addValueChangeListener(new ValueChangeListener() {
 			@Override
 			public void valueChanged(ValueChangeEvent valueChangeEvent) {
-				String selectedPlaylist = valueChangeEvent.getNewValue().toString();
-				List<Song> playlistSongs = playlistManager.getPlaylist(selectedPlaylist).getSongs();
-				Collections.sort(playlistSongs);
-				songs.setValueChoices(playlistSongs);
-				songs.setValue(playlistSongs);
-				songs.setNote(playlistSongs.size() + " song found.");
+				String selectedPlaylist = valueChangeEvent.getNewValue() == null ? "":valueChangeEvent.getNewValue().toString();
+				List<Song> playlistSongs = null;
+				if("".equals(selectedPlaylist)){
+					//no playlist selected then all songs in all playlists
+					playlistSongs = appCache.getAllSongs();
+				} else{
+					playlistSongs = playlistManager.getPlaylist(selectedPlaylist).getSongs();
+				}
+
+				if(songs != null){
+					Collections.sort(playlistSongs);
+					songs.setValueChoices(playlistSongs);
+					songs.setValue(playlistSongs);
+					songs.setNote(playlistSongs.size() + " song(s) found.");
+				}
+
 			}
 		});
 		
