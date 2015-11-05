@@ -90,8 +90,13 @@ public class ConfigCommand extends AbstractUICommand {
             throws Exception {
 
         String currentPlaylistName = playlistManager.getCurrentPlaylist() != null ? playlistManager.getCurrentPlaylist().getName() : "";
-        boolean playlistChanged = !playlist.getValue().equals(currentPlaylistName);
+        boolean playlistChanged = !playlist.getValue().equals(currentPlaylistName);//do not use valueChangeListener
         if (playlistChanged && player.isPlaying()) {
+           if("".equals(playlist.getValue())){
+               playlistManager.setCurrentPlaylist(null);//will enqueue all songs from all playlists
+           } else{
+               playlistManager.setCurrentPlaylist(playlistManager.getPlaylist(playlist.getValue()));
+           }
             playlistEvent.fire(new ChangePlaylistEvent(playlistManager.getCurrentPlaylist()));
         }
 

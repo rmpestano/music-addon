@@ -65,7 +65,7 @@ public class ConfigCommandTest extends BaseTest{
             Logger.getLogger(getClass().getName()).severe(result.getMessage());
         }
 
-        assertThat(playlistManager.getCurrentPlaylist(),is(playlistManager.getPlaylist(playlist)));
+        assertThat(playlistManager.getCurrentPlaylist(),equalTo(playlistManager.getPlaylist(playlist)));
 
     }
 
