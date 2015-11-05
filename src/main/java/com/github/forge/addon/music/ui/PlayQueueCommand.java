@@ -41,7 +41,6 @@ public class PlayQueueCommand extends AbstractUICommand {
 	@Override
 	public void initializeUI(final UIBuilder builder) throws Exception {
 		List<Song> enqueuedSongs = player.getPlayQueue();
-		Collections.sort(enqueuedSongs);
 		songs.setValueChoices(enqueuedSongs);
 		builder.add(songs);
 	}
@@ -50,7 +49,6 @@ public class PlayQueueCommand extends AbstractUICommand {
 	public Result execute(UIExecutionContext uiExecutionContext) throws Exception {
 		if (!uiExecutionContext.getUIContext().getProvider().isGUI()) {
 			List<Song> enqueuedSongs = player.getPlayQueue();
-			Collections.sort(enqueuedSongs);
 			PrintStream out = uiExecutionContext.getUIContext().getProvider().getOutput().out();
 			out.println(enqueuedSongs.size() + " songs found in playqueue:");
 			int i = 1;

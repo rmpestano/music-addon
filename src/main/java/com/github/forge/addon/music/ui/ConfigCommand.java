@@ -1,3 +1,4 @@
+
 package com.github.forge.addon.music.ui;
 
 import com.github.forge.addon.music.event.ChangePlaylistEvent;
@@ -40,9 +41,6 @@ public class ConfigCommand extends AbstractUICommand {
     @Inject
     Event<ChangePlaylistEvent> playlistEvent;
 
-    private boolean playlstChanged;
-
-
     @Inject
     @WithAttributes(label = "Select playlist", description = "Current playlist", type = InputType.DROPDOWN)
     private UISelectOne<String> playlist;
@@ -68,7 +66,7 @@ public class ConfigCommand extends AbstractUICommand {
     }
 
     @Override
-    public void initializeUI(UIBuilder uiBuilder) throws Exception {
+    public void initializeUI(final UIBuilder uiBuilder) throws Exception {
         List<String> playlistNames = new ArrayList();
         playlistNames.add("");
         playlistNames.addAll(playlistManager.getPlaylists().keySet());
@@ -78,19 +76,11 @@ public class ConfigCommand extends AbstractUICommand {
             playlist.setDefaultValue(playlistManager.getCurrentPlaylist().getName());
         }
 
-        playlist.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChanged(ValueChangeEvent valueChangeEvent) {
-                playlstChanged = true;//if playlist has changed fire event
-            }
-        });
-
         random.setDefaultValue(player.isRandom());
 
         repeat.setDefaultValue(player.isRepeat());
 
         songStatistics.setDefaultValue(player.isGenerateStatistics());
-
 
         uiBuilder.add(playlist).add(random).add(repeat).add(songStatistics);
     }
@@ -99,7 +89,9 @@ public class ConfigCommand extends AbstractUICommand {
     public Result execute(UIExecutionContext uiExecutionContext)
             throws Exception {
 
-        if (playlstChanged && player.isPlaying()) {
+        String currentPlaylistName = playlistManager.getCurrentPlaylist() != null ? playlistManager.getCurrentPlaylist().getName() : "";
+        boolean playlistChanged = !playlist.getValue().equals(currentPlaylistName);
+        if (playlistChanged && player.isPlaying()) {
             playlistEvent.fire(new ChangePlaylistEvent(playlistManager.getCurrentPlaylist()));
         }
 
