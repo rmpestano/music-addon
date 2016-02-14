@@ -83,7 +83,7 @@ public class SongsFilter {
 			}
 
 			// filter by genre
-			if (hasText(genre)) {
+			if (hasText(genre) && !genre.equalsIgnoreCase("all")) {
 				if (!hasText(song.getGenre())) {
 					continue;// no artist, cant match search criteria
 				}

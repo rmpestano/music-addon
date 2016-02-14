@@ -50,6 +50,7 @@ public class AppCache {
 
     private void initGenresCache() {
         genres = new HashSet<>();
+        genres.add("All");
         for (Song song : getAllSongs()) {
             genres.add(song.getGenre());
         }
