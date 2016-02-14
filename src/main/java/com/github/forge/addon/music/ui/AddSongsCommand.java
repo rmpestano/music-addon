@@ -4,7 +4,6 @@ import com.github.forge.addon.music.event.AddSongEvent;
 import com.github.forge.addon.music.model.Playlist;
 import com.github.forge.addon.music.model.Song;
 import com.github.forge.addon.music.playlist.PlaylistManager;
-import com.github.forge.addon.music.util.AppCache;
 import org.jboss.forge.addon.resource.DirectoryResource;
 import org.jboss.forge.addon.resource.FileResource;
 import org.jboss.forge.addon.resource.Resource;
@@ -30,7 +29,6 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class AddSongsCommand extends AbstractUICommand {
@@ -88,7 +86,7 @@ public class AddSongsCommand extends AbstractUICommand {
 
     @Override
     public Result execute(UIExecutionContext context) throws Exception {
-        List<Song> songsToAdd = new LinkedList<>();
+        List<Song> songsToAdd = new ArrayList<>();
         if (dir.getValue() != null) {
             addSongsFromDir(dir.getValue(), songsToAdd);
         }

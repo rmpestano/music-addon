@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.forge.addon.music.util.Assert.hasText;
+
 /**
  * Created by pestano on 02/11/15.
  */
@@ -50,9 +52,11 @@ public class AppCache {
 
     private void initGenresCache() {
         genres = new HashSet<>();
-        genres.add("All");
+        genres.add("");
         for (Song song : getAllSongs()) {
-            genres.add(song.getGenre());
+            if(hasText(song.getGenre())){
+                genres.add(song.getGenre());
+            }
         }
     }
 
@@ -60,6 +64,7 @@ public class AppCache {
         for (Song song : addSongEvent.getAddedSongs()) {
             if(!getAllSongs().contains(song)){
                 allSongs.add(song);
+                if(hasText(song.getGenre()))
                 getGenres().add(song.getGenre());
             }
         }
