@@ -38,14 +38,12 @@
          <classifier>forge-addon</classifier>
          <scope>provided</scope>
       </dependency>  
-
      <dependency>
          <groupId>org.jboss.forge.furnace.container</groupId>
          <artifactId>cdi</artifactId>
          <classifier>forge-addon</classifier>
 		 <scope>provided</scope>
       </dependency>
-
       <dependency>
          <groupId>javazoom</groupId>
          <artifactId>jlayer</artifactId>
